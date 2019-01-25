@@ -1,3 +1,27 @@
 <?xml version="1.0" encoding="utf-8"?>
-<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
-</PreferenceScreen>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:title="Share Preference on Twitter">
+
+        <CheckBoxPreference
+            android:key="session_title"
+            android:title="Session Title"
+            android:summary="(ex.マルチモジュールなプロジェクトでテストはどう変わる？)"
+            android:defaultValue="true" />
+        <CheckBoxPreference
+            android:key="session_url"
+            android:title="Session URL"
+            android:summary="(ex.https://droidkaigi.jp/2019/...)"
+            android:defaultValue="true" />
+        <CheckBoxPreference
+            android:key="event_hashtag"
+            android:title="Event Hashtag"
+            android:summary="(ex.#droidkaigi)"
+            android:defaultValue="true" />
+        <CheckBoxPreference
+            android:key="room_hashtag"
+            android:title="Room Hashtag"
+            android:summary="(ex.#hallA,#room1)"
+            android:defaultValue="true" />
+    </PreferenceScreen>
+
