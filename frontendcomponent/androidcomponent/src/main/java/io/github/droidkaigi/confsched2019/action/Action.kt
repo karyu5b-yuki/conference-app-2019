@@ -30,6 +30,10 @@ sealed class Action {
         val sessions: List<Session>
     ) : Action()
 
+    data class SettingsChanged(
+        val //mapを使ってkeyとvalueの組み合わせを入れる
+    )
+
     data class SessionPageSelected(val sessionPage: SessionPage) : Action()
     class SystemPropertyLoaded(val system: SystemProperty) : Action()
 
