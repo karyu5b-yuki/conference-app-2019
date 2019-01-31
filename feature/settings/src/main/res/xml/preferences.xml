@@ -1,34 +1,30 @@
 <?xml version="1.0" encoding="utf-8"?>
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto">
+                  xmlns:app="http://schemas.android.com/apk/res-auto"
+                  android:title="Share Preference on Twitter">
 
-
-        <PreferenceCategory
-        android:key="@string/share_setting_key"
-        android:title="@string/share_setting_title"/>
-
-        <CheckBoxPreference
-            android:key="@string/session_title_key"
-            android:title="@string/session_title_title"
-            android:summary="@string/session_title_summary_true"
-            android:defaultValue="@bool/session_title_default" />
-        <CheckBoxPreference
-            android:key="@string/session_url_key"
-            android:title="@string/session_url_title"
-            android:summary="@string/session_url_summary_true"
-            android:defaultValue="@bool/session_url_default" />
-        <CheckBoxPreference
-            android:key="@string/event_hashtag_key"
-            android:title="@string/event_hashtag_title"
-            android:summary="@string/event_hashtag_summary_true"
-            android:defaultValue="@bool/event_hashtag_default" />
-        <CheckBoxPreference
-            android:key="@string/room_hashtag_key"
-            android:title="@string/room_hashtag_title"
-            android:summary="@string/room_hashtag_summary_true"
-            android:defaultValue="@bool/room_hashtag_default" />
-
-        </PreferenceCategory>
-
+    <CheckBoxPreference
+        android:key="@string/session_title_key"
+        android:title="@string/session_title_title"
+        android:summaryOn="@string/session_title_summary_true"
+        android:summaryOff="@string/session_title_summary_false"
+        android:defaultValue="@bool/session_title_default" />
+    <CheckBoxPreference
+        android:key="@string/session_url_key"
+        android:title="@string/session_url_title"
+        android:summaryOn="@string/session_url_summary_true"
+        android:summaryOff="@string/session_url_summary_false"
+        android:defaultValue="@bool/session_url_default" />
+    <CheckBoxPreference
+        android:key="@string/event_hashtag_key"
+        android:title="@string/event_hashtag_title"
+        android:summaryOn="@string/event_hashtag_summary_true"
+        android:summaryOff="@string/event_hashtag_summary_false"
+        android:defaultValue="@bool/event_hashtag_default" />
+    <CheckBoxPreference
+        android:key="@string/room_hashtag_key"
+        android:title="@string/room_hashtag_title"
+        android:summaryOn="@string/room_hashtag_summary_true"
+        android:summaryOff="@string/room_hashtag_summary_false"
+        android:defaultValue="@bool/room_hashtag_default" />
 </PreferenceScreen>
-

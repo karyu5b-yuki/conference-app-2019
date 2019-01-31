@@ -42,5 +42,4 @@ class SettingsFragment : PreferenceFragmentCompat(),
         //処理をここに書こう。
     }
 
-    data class Step(val value: Int)
 }

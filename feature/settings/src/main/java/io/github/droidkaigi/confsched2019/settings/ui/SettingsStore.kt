@@ -17,7 +17,7 @@ class SettingsStore @Inject constructor(
         // val contents: List<SettingContent>
         // ) : Action()
         .subscribe<Action.SettingContentsChanged>()
-        // mapは変換するという意味。Actoin..SettingContentsLoadedから利用したいcontentsを取得して、伝搬したい。
+        // mapは変換するという意味。Action..SettingContentsLoadedから利用したいcontentsを取得して、伝搬したい。
         .map { it.contents }
-        .toLiveData(SettinlsResult.EMPTY)
+        .toLiveData(SettingsResult.EMPTY)
 }

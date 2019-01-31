@@ -30,6 +30,12 @@ sealed class Action {
         val sessions: List<Session>
     ) : Action()
 
+    data class SettingContent(val value: Boolean) {
+        companion object {
+            val EMPTY = SettingContent(false)
+        }
+    }
+
     data class SessionPageSelected(val sessionPage: SessionPage) : Action()
     data class SessionPageReselected(val sessionPage: SessionPage) : Action()
     class SystemPropertyLoaded(val system: SystemProperty) : Action()
@@ -85,10 +91,6 @@ sealed class Action {
 
     data class SettingContentsChanged(val contents: List<SettingContent>) : Action()
 
-    // Sessionがあるディレクトリと同じ場所に書く。valueは適切な名前に変更する。
-    data class SettingContent(val value: Boolean) {
-        companion object {
-            val EMPTY = SettingContent(false)
-        }
-    }
+
+
 }
