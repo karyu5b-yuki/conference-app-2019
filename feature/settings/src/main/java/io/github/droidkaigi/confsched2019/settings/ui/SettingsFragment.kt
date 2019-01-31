@@ -8,69 +8,39 @@ import android.content.res.TypedArray
 import android.os.Parcel
 import android.os.Parcelable
 
+class SettingsFragment : PreferenceFragmentCompat(),
+    SharedPreferences.OnSharedPreferenceChangeListener {
+    @Inject lateinit var preferenceActionCreator: PreferenceActionCreator
 
-
-
-
-class SettingsFragment : PreferenceFragmentCompat(), SharedPreferences.OnSharedPreferenceChangeListener {
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences)
     }
 
-    override fun onResume() {
-        super.onResume()
-
+    override fun onCreate() {
         preferenceScreen.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+        SettingsStore.settingsResult.changed(viewLifecycleOwner) { settingsResult ->
+            // TODO 流れてきたら更新 xmlに記載しているswitchのidを取得して、bindする。
+            // 対応するswitchのon offを変更する。
+        }
     }
 
-    override fun onPause() {
-        super.onPause()
-
+    override fun onDestory() {
+        // TODO: ここで、現状のswitchのon, offをSharedPreferenceに保存してあげる。
         preferenceScreen.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
+        super.onDestroy()
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
         val changedValue = sharedPreferences?.getBoolean(
             key, false
         )
-//処理をここに書こう。
-    }
-}
-
-protected fun onGetDefaultValue(a: TypedArray, index: Int): Any {
-    return a.getInteger(index, DEFAULT_VALUE)
-}
-
-private class SavedState : BaseSavedState {
-    // Member that holds the setting's value
-    // Change this data type to match the type saved by your Preference
-    internal var value: Int = 0
-
-    constructor(superState: Parcelable) : super(superState) {}
-
-    constructor(source: Parcel) : super(source) {
-        // Get the current preference's value
-        value = source.readInt()  // Change this to read the appropriate data type
+        // TODO: SettingContentsChangedをインスタンス化し、submitする。
+        // 以下を行う際には、既存の4つの値のうち、変更されたものだけを更新して配列をコンストラクタの引数として渡す。
+        // SettingContentsChanged(listof(true, true, true, false))みたいな感じ。実際は変数で置く。
+        // NOTE: 実際にpreferenceActionCreator.submit()で行なっている処理は、dispatcherがactionを伝えること。
+        preferenceActionCreator.submit(SettingContentsChanged())
+        //処理をここに書こう。
     }
 
-    fun writeToParcel(dest: Parcel, flags: Int) {
-        super.writeToParcel(dest, flags)
-        // Write the preference's value
-        dest.writeInt(value)  // Change this to write the appropriate data type
-    }
-
-    companion object {
-
-        // Standard creator object using an instance of this class
-        val CREATOR: Parcelable.Creator<SavedState> = object : Parcelable.Creator<SavedState> {
-
-            override fun createFromParcel(`in`: Parcel): SavedState {
-                return SavedState(`in`)
-            }
-
-            override fun newArray(size: Int): Array<SavedState> {
-                return arrayOfNulls(size)
-            }
-        }
-    }
+    data class Step(val value: Int)
 }
