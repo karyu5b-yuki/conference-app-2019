@@ -7,6 +7,9 @@ import io.github.droidkaigi.confsched2019.settings.R
 import android.content.res.TypedArray
 import android.os.Parcel
 import android.os.Parcelable
+import io.github.droidkaigi.confsched2019.action.Action
+import io.github.droidkaigi.confsched2019.system.actioncreator.PreferenceActionCreator
+import javax.inject.Inject
 
 class SettingsFragment : PreferenceFragmentCompat(),
     SharedPreferences.OnSharedPreferenceChangeListener {
@@ -18,9 +21,14 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
     override fun onCreate() {
         preferenceScreen.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
-        SettingsStore.settingsResult.changed(viewLifecycleOwner) { settingsResult ->
+        SettingsStore.settingsResult.changed(viewLifecycleOwner) {
             // TODO 流れてきたら更新 xmlに記載しているswitchのidを取得して、bindする。
             // 対応するswitchのon offを変更する。
+           /* settingsResult[]
+            "@string/session_title_key",checkboxのon/offによるbool値
+            "@string/session_url_key",
+            "@string/event_hashtag_key",
+            "@string/room_hashtag_key"*/
         }
     }
 
@@ -31,15 +39,15 @@ class SettingsFragment : PreferenceFragmentCompat(),
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        val changedValue = sharedPreferences?.getBoolean(
+        val changed = sharedPreferences?.getBoolean(
             key, false
         )
         // TODO: SettingContentsChangedをインスタンス化し、submitする。
         // 以下を行う際には、既存の4つの値のうち、変更されたものだけを更新して配列をコンストラクタの引数として渡す。
         // SettingContentsChanged(listof(true, true, true, false))みたいな感じ。実際は変数で置く。
         // NOTE: 実際にpreferenceActionCreator.submit()で行なっている処理は、dispatcherがactionを伝えること。
-        preferenceActionCreator.submit(SettingContentsChanged())
-        //処理をここに書こう。
+        preferenceActionCreator.submit(Action.SettingContentsChanged(mutableListOf()))
+
     }
 
 }

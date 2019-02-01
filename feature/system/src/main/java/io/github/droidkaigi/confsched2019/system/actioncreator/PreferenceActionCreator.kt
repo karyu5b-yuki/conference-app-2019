@@ -10,10 +10,11 @@ import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.plus
 import javax.inject.Inject
 
-class PreferenceActionCreator @Inject constructor(val dispatcher: Dispatcher) {
+class PreferenceActionCreator @Inject constructor(val dispatcher: Dispatcher)
+    : CoroutineScope by GlobalScope + SupervisorJob() {
     // TOOD コンパイルエラーが出るようであれば、他のActionCreatorのようにScopeを追加する。
 
-    fun submit(action: Action) {
+    suspend fun submit(action: Action) {
         dispatcher.dispatch(action)
     }
 
