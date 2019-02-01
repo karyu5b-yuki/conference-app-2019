@@ -14,7 +14,7 @@ class PreferenceActionCreator @Inject constructor(val dispatcher: Dispatcher)
     : CoroutineScope by GlobalScope + SupervisorJob() {
     // TOOD コンパイルエラーが出るようであれば、他のActionCreatorのようにScopeを追加する。
 
-    suspend fun submit(action: Action) {
+    fun submit(action: Action) {
         dispatcher.dispatch(action)
     }
 
