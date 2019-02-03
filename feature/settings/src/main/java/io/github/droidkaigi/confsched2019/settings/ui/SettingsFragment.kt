@@ -4,24 +4,32 @@ import android.content.SharedPreferences
 import android.os.Bundle
 import androidx.preference.PreferenceFragmentCompat
 import io.github.droidkaigi.confsched2019.settings.R
-import android.content.res.TypedArray
-import android.os.Parcel
-import android.os.Parcelable
 import io.github.droidkaigi.confsched2019.action.Action
+import io.github.droidkaigi.confsched2019.ext.android.changed
 import io.github.droidkaigi.confsched2019.system.actioncreator.PreferenceActionCreator
+import me.tatarka.injectedvmprovider.InjectedViewModelProviders
 import javax.inject.Inject
+import javax.inject.Provider
 
 class SettingsFragment : PreferenceFragmentCompat(),
     SharedPreferences.OnSharedPreferenceChangeListener {
     @Inject lateinit var preferenceActionCreator: PreferenceActionCreator
+    @Inject lateinit var settingsStoreProvider: Provider<SettingsStore>
+    private val settingsStore: SettingsStore by lazy {
+        InjectedViewModelProviders.of(requireActivity()).get(settingsStoreProvider)
+    }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences)
+
     }
 
-    override fun onCreate() {
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         preferenceScreen.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
-        SettingsStore.settingsResult.changed(viewLifecycleOwner) {
+        settingsStore.settingsResult.changed(viewLifecycleOwner) { settingsContents ->
+            settingsContents[0]
+        }
             // TODO 流れてきたら更新 xmlに記載しているswitchのidを取得して、bindする。
             // 対応するswitchのon offを変更する。
            /* settingsResult[]
@@ -29,10 +37,10 @@ class SettingsFragment : PreferenceFragmentCompat(),
             "@string/session_url_key",
             "@string/event_hashtag_key",
             "@string/room_hashtag_key"*/
-        }
+//        }
     }
 
-    override fun onDestory() {
+    override fun onDestroy() {
         // TODO: ここで、現状のswitchのon, offをSharedPreferenceに保存してあげる。
         preferenceScreen.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
         super.onDestroy()

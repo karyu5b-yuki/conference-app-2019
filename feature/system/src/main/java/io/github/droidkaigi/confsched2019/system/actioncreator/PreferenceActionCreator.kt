@@ -15,7 +15,7 @@ class PreferenceActionCreator @Inject constructor(val dispatcher: Dispatcher)
     // TOOD コンパイルエラーが出るようであれば、他のActionCreatorのようにScopeを追加する。
 
     fun submit(action: Action) {
-        dispatcher.dispatch(action)
+//        dispatcher.dispatch(action)
     }
 
 }

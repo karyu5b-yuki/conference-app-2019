@@ -6,7 +6,9 @@ import io.github.droidkaigi.confsched2019.dispatcher.Dispatcher
 import io.github.droidkaigi.confsched2019.ext.android.toLiveData
 import kotlinx.coroutines.channels.map
 import javax.inject.Inject
+import javax.inject.Singleton
 
+@Singleton
 class SettingsStore @Inject constructor(
     dispatcher: Dispatcher
 ) : ViewModel() {
