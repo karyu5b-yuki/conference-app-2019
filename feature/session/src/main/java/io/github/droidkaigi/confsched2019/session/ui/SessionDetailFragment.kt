@@ -28,7 +28,7 @@ import com.xwray.groupie.databinding.ViewHolder
 import dagger.Module
 import dagger.Provides
 import io.github.droidkaigi.confsched2019.di.PageScope
-import io.github.droidkaigi.confsched2019.ext.android.changed
+import io.github.droidkaigi.confsched2019.ext.changed
 import io.github.droidkaigi.confsched2019.model.LoadingState
 import io.github.droidkaigi.confsched2019.model.ServiceSession
 import io.github.droidkaigi.confsched2019.model.SpeechSession
@@ -111,6 +111,27 @@ class SessionDetailFragment : DaggerFragment() {
                         }
                     )
                 }
+                R.id.session_calendar -> {
+                    val session = binding.session ?: return@setOnMenuItemClickListener false
+                    when (session) {
+                        is SpeechSession -> {
+                            activityActionCreator.openCalendar(
+                                session.title.getByLang(defaultLang()),
+                                session.room.name,
+                                session.startTime.unixMillisLong,
+                                session.endTime.unixMillisLong
+                            )
+                        }
+                        is ServiceSession -> {
+                            activityActionCreator.openCalendar(
+                                session.title.getByLang(defaultLang()),
+                                session.room.name,
+                                session.startTime.unixMillisLong,
+                                session.endTime.unixMillisLong
+                            )
+                        }
+                    }
+                }
             }
             return@setOnMenuItemClickListener true
         }
@@ -140,6 +161,7 @@ class SessionDetailFragment : DaggerFragment() {
 
         binding.sessionFavorite.setOnClickListener {
             val session = binding.session ?: return@setOnClickListener
+            progressTimeLatch.loading = true
 
             // Immediate reflection on view to avoid time lag
             binding.sessionFavorite.setImageResource(
@@ -179,12 +201,7 @@ class SessionDetailFragment : DaggerFragment() {
 
         binding.sessionTitle.text = session.title.getByLang(lang)
 
-        val timeInMinutes: Int = session.timeInMinutes
-        binding.sessionTimeAndRoom.text = getString(
-            R.string.session_duration_room_format,
-            timeInMinutes,
-            session.room.name
-        )
+        binding.sessionTimeAndRoom.text = session.shortSummary()
         binding.sessionIntendedAudienceDescription.text = session.intendedAudience
         binding.categoryChip.text = session.category.name.getByLang(defaultLang())
 
@@ -280,13 +297,7 @@ class SessionDetailFragment : DaggerFragment() {
 
         binding.sessionTitle.text = session.title.getByLang(lang)
 
-        val timeInMinutes: Int = session.timeInMinutes
-        binding.sessionTimeAndRoom.text = getString(
-            R.string.session_duration_room_format,
-            timeInMinutes,
-            session.room.name
-        )
-
+        binding.sessionTimeAndRoom.text = session.shortSummary()
         binding.sessionDescription.text = session.desc
     }
 }

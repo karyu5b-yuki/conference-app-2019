@@ -5,7 +5,7 @@ import io.github.droidkaigi.confsched2019.action.Action
 import io.github.droidkaigi.confsched2019.data.repository.SessionRepository
 import io.github.droidkaigi.confsched2019.dispatcher.Dispatcher
 import io.github.droidkaigi.confsched2019.dummySessionData
-import io.github.droidkaigi.confsched2019.ext.android.CoroutinePlugin
+import io.github.droidkaigi.confsched2019.ext.CoroutinePlugin
 import io.github.droidkaigi.confsched2019.firstDummySpeechSession
 import io.github.droidkaigi.confsched2019.model.LoadingState
 import io.github.droidkaigi.confsched2019.model.SessionContents
@@ -70,12 +70,14 @@ class SessionContentsActionCreatorTest {
         )
 
         coVerify(ordering = Ordering.SEQUENCE) {
+            dispatcher.dispatch(Action.SessionLoadingStateChanged(LoadingState.LOADING))
             sessionRepository.toggleFavorite(firstDummySpeechSession())
             sessionAlarm.toggleRegister(firstDummySpeechSession())
             sessionRepository.sessionContents()
             dispatcher.dispatch(
                 Action.SessionContentsLoaded(dummySessionContents)
             )
+            dispatcher.dispatch(Action.SessionLoadingStateChanged(LoadingState.LOADED))
         }
     }
 }

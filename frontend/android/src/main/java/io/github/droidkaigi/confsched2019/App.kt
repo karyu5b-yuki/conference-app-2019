@@ -16,7 +16,8 @@ import dagger.android.DaggerApplication
 import io.fabric.sdk.android.Fabric
 import io.github.droidkaigi.confsched2019.announcement.ui.subscribeAnnouncementTopic
 import io.github.droidkaigi.confsched2019.di.createAppComponent
-import io.github.droidkaigi.confsched2019.ext.android.changedForever
+import io.github.droidkaigi.confsched2019.ext.changedForever
+import io.github.droidkaigi.confsched2019.model.SystemProperty
 import io.github.droidkaigi.confsched2019.system.actioncreator.SystemActionCreator
 import io.github.droidkaigi.confsched2019.system.store.SystemStore
 import timber.log.LogcatTree
@@ -37,10 +38,13 @@ open class App : DaggerApplication() {
         setupFirestore()
         setupLogHandler()
         systemStore.systemProperty.changedForever {
-            // listening
-            subscribeAnnouncementTopic(it.lang)
+            subscribeAnnouncementTopic(it)
         }
         systemActionCreator.setupSystem()
+    }
+
+    open fun subscribeAnnouncementTopic(systemProperty: SystemProperty) {
+        subscribeAnnouncementTopic(systemProperty.lang)
     }
 
     private fun setupFont() {
@@ -88,10 +92,9 @@ open class App : DaggerApplication() {
     open fun setupLogHandler() {
         Fabric.with(this, Crashlytics())
         Timber.plant(CrashlyticsTree())
-        enableLogCatLogging()
     }
 
-    fun enableLogCatLogging() {
+    fun enableLogcatLogging() {
         Timber.plant(LogcatTree("droidkaigi"))
     }
 

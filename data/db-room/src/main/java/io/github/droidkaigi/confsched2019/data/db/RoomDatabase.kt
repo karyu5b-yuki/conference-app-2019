@@ -1,10 +1,12 @@
 package io.github.droidkaigi.confsched2019.data.db
 
 import io.github.droidkaigi.confsched2019.data.api.response.AnnouncementResponse
+import io.github.droidkaigi.confsched2019.data.api.response.ContributorResponse
 import io.github.droidkaigi.confsched2019.data.api.response.Response
 import io.github.droidkaigi.confsched2019.data.api.response.SponsorResponse
 import io.github.droidkaigi.confsched2019.data.api.response.StaffResponse
 import io.github.droidkaigi.confsched2019.data.db.dao.AnnouncementDao
+import io.github.droidkaigi.confsched2019.data.db.dao.ContributorDao
 import io.github.droidkaigi.confsched2019.data.db.dao.SessionDao
 import io.github.droidkaigi.confsched2019.data.db.dao.SessionFeedbackDao
 import io.github.droidkaigi.confsched2019.data.db.dao.SessionSpeakerJoinDao
@@ -12,12 +14,14 @@ import io.github.droidkaigi.confsched2019.data.db.dao.SpeakerDao
 import io.github.droidkaigi.confsched2019.data.db.dao.SponsorDao
 import io.github.droidkaigi.confsched2019.data.db.dao.StaffDao
 import io.github.droidkaigi.confsched2019.data.db.entity.AnnouncementEntity
+import io.github.droidkaigi.confsched2019.data.db.entity.ContributorEntity
 import io.github.droidkaigi.confsched2019.data.db.entity.SessionFeedbackEntity
 import io.github.droidkaigi.confsched2019.data.db.entity.SessionWithSpeakers
 import io.github.droidkaigi.confsched2019.data.db.entity.SpeakerEntity
 import io.github.droidkaigi.confsched2019.data.db.entity.SponsorEntity
 import io.github.droidkaigi.confsched2019.data.db.entity.StaffEntity
 import io.github.droidkaigi.confsched2019.data.db.entity.mapper.toAnnouncementEntities
+import io.github.droidkaigi.confsched2019.data.db.entity.mapper.toContributorEntities
 import io.github.droidkaigi.confsched2019.data.db.entity.mapper.toSessionEntities
 import io.github.droidkaigi.confsched2019.data.db.entity.mapper.toSessionFeedbackEntity
 import io.github.droidkaigi.confsched2019.data.db.entity.mapper.toSessionSpeakerJoinEntities
@@ -39,8 +43,9 @@ class RoomDatabase @Inject constructor(
     private val coroutineContext: CoroutineContext,
     private val sponsorDao: SponsorDao,
     private val announcementDao: AnnouncementDao,
-    private val staffDao: StaffDao
-) : SessionDatabase, SponsorDatabase, AnnouncementDatabase, StaffDatabase {
+    private val staffDao: StaffDao,
+    private val contributorDao: ContributorDao
+) : SessionDatabase, SponsorDatabase, AnnouncementDatabase, StaffDatabase, ContributorDatabase {
     override suspend fun sessions(): List<SessionWithSpeakers> {
         return sessionSpeakerJoinDao.getAllSessions()
     }
@@ -52,7 +57,9 @@ class RoomDatabase @Inject constructor(
             // FIXME: SQLiteDatabaseLockedException
             database.runInTransaction {
                 database.sqlite().execSQL("PRAGMA defer_foreign_keys = TRUE")
-                database.clearAllTables()
+                sessionSpeakerJoinDao.deleteAll()
+                speakerDao.deleteAll()
+                sessionDao.deleteAll()
                 val speakers = apiResponse.speakers.orEmpty().toSpeakerEntities()
                 speakerDao.insert(speakers)
                 val sessions = apiResponse.sessions
@@ -93,6 +100,7 @@ class RoomDatabase @Inject constructor(
                     }
                     .flatten()
 
+                sponsorDao.deleteAll()
                 sponsorDao.insert(sponsors)
             }
         }
@@ -105,7 +113,7 @@ class RoomDatabase @Inject constructor(
         withContext(coroutineContext) {
             database.runInTransaction {
                 val announcements = apiResponse.toAnnouncementEntities()
-
+                announcementDao.deleteAll()
                 announcementDao.insert(announcements)
             }
         }
@@ -119,6 +127,19 @@ class RoomDatabase @Inject constructor(
                 val staffs = apiResponse.staffs.toStaffEntities()
                 staffDao.deleteAll()
                 staffDao.insert(staffs)
+            }
+        }
+    }
+
+    override suspend fun contributorList(): List<ContributorEntity> =
+        contributorDao.allContributors()
+
+    override suspend fun save(apiResponse: ContributorResponse) {
+        withContext(coroutineContext) {
+            database.runInTransaction {
+                val contributors = apiResponse.contributors.toContributorEntities()
+                contributorDao.deleteAll()
+                contributorDao.insert(contributors)
             }
         }
     }

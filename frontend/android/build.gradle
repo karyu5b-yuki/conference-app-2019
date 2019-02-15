@@ -1,4 +1,5 @@
 import dependencies.Dep
+import dependencies.Packages
 import dependencies.Versions
 
 apply plugin: 'com.android.application'
@@ -21,12 +22,12 @@ android {
         release {
             keyAlias System.getenv("RELEASE_KEY_ALIAS")
             keyPassword System.getenv("RELEASE_KEY_PASSWORD")
-            storeFile file(System.getenv("RELEASE_STORE_FILE") ?: "debug.keystore")
-            storePassword System.getenv("RELEASE_PASSWORD")
+            storeFile file(System.getenv("RELEASE_KEY_STORE_FILE") ?: 'debug.keystore')
+            storePassword System.getenv("RELEASE_KEY_STORE_PASSWORD")
         }
     }
     defaultConfig {
-        applicationId "io.github.droidkaigi.confsched2019"
+        applicationId Packages.name
         minSdkVersion Versions.androidMinSdkVersion
         targetSdkVersion 28
         versionCode Versions.androidVersionCode
@@ -34,13 +35,30 @@ android {
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         multiDexEnabled true
         resConfigs "ja"
-        // For Android Studio Gradle sync
-        applicationIdSuffix ".debug"
+        if (!isCi && !isReleaseBuild) {
+            // For Android Studio Gradle sync
+            // gms plugin cannot parse google-service.json correctly if applicationIdSuffix is specified here
+            applicationIdSuffix Packages.debugNameSuffix
+        }
         manifestPlaceholders = [isCi: String.valueOf(isCi)]
     }
     buildTypes {
+        debug {
+            if (isCi || isReleaseBuild) {
+                applicationIdSuffix Packages.debugNameSuffix
+            }
+            manifestPlaceholders = [appName: "@string/app_name_debug"]
+            debuggable true
+        }
         staging {
+            if (isCi || isReleaseBuild) {
+                applicationIdSuffix Packages.debugNameSuffix
+            }
+            manifestPlaceholders = [appName: "@string/app_name_staging"]
+            debuggable true
             zipAlignEnabled true
+            signingConfig = signingConfigs.debug
+            matchingFallbacks = ['release']
 
             postprocessing {
                 proguardFiles 'proguard-rules.pro'
@@ -53,18 +71,21 @@ android {
                 codeShrinker = 'r8'
             }
         }
-        release.initWith(staging)
-        staging {
-            debuggable true
-            signingConfig = signingConfigs.debug
-            matchingFallbacks = ['release']
-        }
         release {
-            applicationIdSuffix null
+            manifestPlaceholders = [appName: "@string/app_name"]
+            debuggable false
+            zipAlignEnabled true
             signingConfig = signingConfigs.release
 
             postprocessing {
-                proguardFiles 'proguard-rules-production.pro'
+                proguardFiles 'proguard-rules.pro', 'proguard-rules-production.pro'
+                obfuscate = true
+                // if we want to enable optimization, then codeShrinker must be proguard for now
+                // That may be a bug of r8
+                optimizeCode = false
+                removeUnusedCode = true
+                removeUnusedResources = true
+                codeShrinker = 'r8'
             }
         }
     }
@@ -98,16 +119,18 @@ dependencies {
     implementation project(":feature:floormap")
     implementation project(":feature:sponsor")
     implementation project(":feature:settings")
+    implementation project(":feature:contributor")
     implementation project(":feature:staff")
     implementation project(':feature:user')
     implementation project(':feature:survey')
     implementation project(':feature:system')
     implementation project(':feature:notification')
-    implementation project(':frontendcomponent:androidcomponent')
+    implementation project(':corecomponent:androidcomponent')
     implementation project(':data:db-room')
     implementation project(':data:repository-impl')
     implementation project(':data:firestore-impl')
     implementation project(':data:api-impl')
+    implementation project(':data:device-impl')
     implementation project(':ext:log')
 
     implementation Dep.Kotlin.stdlibJvm
@@ -128,7 +151,8 @@ dependencies {
 
     implementation Dep.AndroidX.coreKtx
 
-    implementation Dep.Stetho.stetho
+    debugImplementation Dep.Stetho.stetho
+    stagingImplementation Dep.Stetho.stetho
 
     debugImplementation Dep.LeakCanary.leakCanary
     debugImplementation Dep.LeakCanary.leakCanaryFragment
@@ -150,6 +174,7 @@ dependencies {
     implementation Dep.Timber.android
 
     testImplementation Dep.Test.junit
+    testImplementation Dep.Test.kotlinTestAssertions
 
     androidTestImplementation Dep.Test.testRunner
     androidTestImplementation Dep.Test.espressoCore

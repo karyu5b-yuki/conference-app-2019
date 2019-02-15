@@ -18,6 +18,7 @@ import com.squareup.inject.assisted.AssistedInject
 import com.squareup.picasso.Picasso
 import com.squareup.picasso.Target
 import com.xwray.groupie.databinding.BindableItem
+import io.github.droidkaigi.confsched2019.item.EqualableContentsProvider
 import io.github.droidkaigi.confsched2019.model.Speaker
 import io.github.droidkaigi.confsched2019.model.SpeechSession
 import io.github.droidkaigi.confsched2019.model.defaultLang
@@ -39,7 +40,7 @@ class SpeechSessionItem @AssistedInject constructor(
     val sessionContentsActionCreator: SessionContentsActionCreator
 ) : BindableItem<ItemSessionBinding>(
     session.id.hashCode().toLong()
-), SessionItem {
+), SessionItem, EqualableContentsProvider {
     val speechSession get() = session
 
     @AssistedInject.Factory
@@ -60,22 +61,27 @@ class SpeechSessionItem @AssistedInject constructor(
     override fun bind(viewBinding: ItemSessionBinding, position: Int) {
         with(viewBinding) {
             root.setOnClickListener {
-                navController.navigate(detailNavDirections)
+                try {
+                    navController.navigate(detailNavDirections)
+                } catch (e: IllegalArgumentException) {
+                    // FIXME: When launching the app and click session multiple times, cause Exception
+                    // see https://github.com/DroidKaigi/conference-app-2019/issues/664
+                }
             }
             session = speechSession
             lang = defaultLang()
             hasStartPadding = this@SpeechSessionItem.hasStartPadding
             query = this@SpeechSessionItem.query
             favorite.setOnClickListener {
+                // apply state immediately
+                viewBinding.session = speechSession.copy(
+                    isFavorited = !speechSession.isFavorited
+                )
                 sessionContentsActionCreator.toggleFavorite(speechSession)
             }
 
             val timeInMinutes: Int = speechSession.timeInMinutes
-            timeAndRoom.text = root.context.getString(
-                R.string.session_duration_room_format,
-                timeInMinutes,
-                speechSession.room.name
-            )
+            timeAndRoom.text = speechSession.shortSummary()
             categoryChip.text = speechSession.category.name.getByLang(defaultLang())
             survey.setOnClickListener {
                 navController.navigate(surveyNavDirections)
@@ -114,6 +120,8 @@ class SpeechSessionItem @AssistedInject constructor(
                 return@forEach
             }
             if (existSpeakerView != null && speaker != null) {
+                existSpeakerView.isVisible = true
+
                 val textView: TextView = existSpeakerView.findViewById(R.id.speaker)
                 textView.text = speaker.name
                 bindSpeakerData(speaker, textView)
@@ -189,19 +197,27 @@ class SpeechSessionItem @AssistedInject constructor(
 
     override fun getLayout(): Int = R.layout.item_session
 
+    override fun providerEqualableContents(): Array<*> = arrayOf(
+        session,
+        if (isContainsQuery()) query else null
+    )
+
+    private fun isContainsQuery() = query?.let {
+        when {
+            session.title.getByLang(defaultLang()).toLowerCase()
+                .contains(query.toLowerCase()) -> true
+            session.speakers.find {
+                it.name.toLowerCase().contains(query.toLowerCase())
+            } != null -> true
+            else -> false
+        }
+    } ?: false
+
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as SpeechSessionItem
-
-        if (session != other.session) return false
-        if (query == null || other.query == null || query != other.query) return false
-
-        return true
+        return isSameContents(other)
     }
 
     override fun hashCode(): Int {
-        return session.hashCode() + query.hashCode()
+        return contentsHash()
     }
 }

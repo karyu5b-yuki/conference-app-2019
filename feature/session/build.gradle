@@ -3,18 +3,23 @@ import dependencies.Dep
 apply plugin: 'com.android.library'
 apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'kotlin-android-extensions'
 apply plugin: 'androidx.navigation.safeargs'
 
 apply from: rootProject.file('gradle/android.gradle')
-android.dataBinding.enabled = true
+android {
+    dataBinding.enabled = true
+    androidExtensions {
+        experimental = true
+    }
+}
 
 dependencies {
     implementation project(":feature:user")
     implementation project(":feature:system")
-    implementation project(':frontendcomponent:androidcomponent')
+    implementation project(':corecomponent:androidcomponent')
     implementation project(":model")
     implementation project(":data:repository")
-    implementation project(':ext:android-extension')
     implementation project(':ext:log')
 
     implementation Dep.Kotlin.stdlibJvm
@@ -22,6 +27,7 @@ dependencies {
     implementation Dep.Kotlin.androidCoroutinesDispatcher
 
     implementation Dep.AndroidX.appCompat
+    implementation Dep.AndroidX.fragment
     implementation Dep.AndroidX.constraint
     implementation Dep.AndroidX.recyclerView
     api Dep.AndroidX.emoji
@@ -53,7 +59,7 @@ dependencies {
     testImplementation Dep.Test.junit
     testImplementation Dep.Test.kotlinTestAssertions
     testImplementation Dep.MockK.jvm
-    testImplementation project(':frontendcomponent:androidtestcomponent')
+    testImplementation project(':corecomponent:androidtestcomponent')
     androidTestImplementation Dep.Test.testRunner
     androidTestImplementation Dep.Test.espressoCore
 }

@@ -5,6 +5,7 @@ import androidx.navigation.NavDirections
 import com.squareup.inject.assisted.Assisted
 import com.squareup.inject.assisted.AssistedInject
 import com.xwray.groupie.databinding.BindableItem
+import io.github.droidkaigi.confsched2019.item.EqualableContentsProvider
 import io.github.droidkaigi.confsched2019.model.ServiceSession
 import io.github.droidkaigi.confsched2019.model.defaultLang
 import io.github.droidkaigi.confsched2019.session.R
@@ -15,11 +16,11 @@ class ServiceSessionItem @AssistedInject constructor(
     @Assisted override val session: ServiceSession,
     @Assisted val navDirections: NavDirections,
     @Assisted val hasStartPadding: Boolean,
-    navController: NavController,
-    sessionContentsActionCreator: SessionContentsActionCreator
+    val navController: NavController,
+    val sessionContentsActionCreator: SessionContentsActionCreator
 ) : BindableItem<ItemServiceSessionBinding>(
     session.id.hashCode().toLong()
-), SessionItem {
+), SessionItem, EqualableContentsProvider {
     val serviceSession get() = session
 
     @AssistedInject.Factory
@@ -31,20 +32,12 @@ class ServiceSessionItem @AssistedInject constructor(
         ): ServiceSessionItem
     }
 
-    private val onFavoriteClickListener: (ServiceSession) -> Unit = { session ->
-        sessionContentsActionCreator.toggleFavorite(session)
-    }
-    private val onClickListener: (ServiceSession) -> Unit = { session ->
-        navController
-            .navigate(
-                navDirections
-            )
-    }
-
     override fun bind(viewBinding: ItemServiceSessionBinding, position: Int) {
         with(viewBinding) {
             if (serviceSession.sessionType.supportDetail) {
-                root.setOnClickListener { onClickListener(serviceSession) }
+                root.setOnClickListener {
+                    navController.navigate(navDirections)
+                }
             } else {
                 root.setOnClickListener(null)
                 root.isClickable = false
@@ -53,32 +46,26 @@ class ServiceSessionItem @AssistedInject constructor(
             session = serviceSession
             lang = defaultLang()
 
-            val timeInMinutes: Int = serviceSession.timeInMinutes
-            timeAndRoom.text = root.context.getString(
-                R.string.session_duration_room_format,
-                timeInMinutes,
-                serviceSession.room.name
-            )
-            favorite.setOnClickListener {
-                onFavoriteClickListener(serviceSession)
+            timeAndRoom.text = serviceSession.shortSummary()
+            favorite.setOnClickListener { view ->
+                // apply state immediately
+                viewBinding.session = serviceSession.copy(
+                    isFavorited = !serviceSession.isFavorited
+                )
+                sessionContentsActionCreator.toggleFavorite(serviceSession)
             }
         }
     }
 
     override fun getLayout(): Int = R.layout.item_service_session
 
+    override fun providerEqualableContents(): Array<*> = arrayOf(session)
+
     override fun equals(other: Any?): Boolean {
-        if (this === other) return true
-        if (javaClass != other?.javaClass) return false
-
-        other as ServiceSessionItem
-
-        if (session != other.session) return false
-
-        return true
+        return isSameContents(other)
     }
 
     override fun hashCode(): Int {
-        return session.hashCode()
+        return contentsHash()
     }
 }

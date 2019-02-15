@@ -2,6 +2,8 @@ package io.github.droidkaigi.confsched2019.session.ui
 
 import android.os.Bundle
 import android.text.method.LinkMovementMethod
+import android.transition.Fade
+import android.transition.TransitionInflater
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
@@ -13,10 +15,11 @@ import com.soywiz.klock.DateTimeSpan
 import dagger.Module
 import dagger.Provides
 import io.github.droidkaigi.confsched2019.di.PageScope
-import io.github.droidkaigi.confsched2019.ext.android.changed
+import io.github.droidkaigi.confsched2019.ext.changed
 import io.github.droidkaigi.confsched2019.model.defaultLang
 import io.github.droidkaigi.confsched2019.session.R
 import io.github.droidkaigi.confsched2019.session.databinding.FragmentSpeakerBinding
+import io.github.droidkaigi.confsched2019.session.ui.bindingadapter.ImageLoadListener
 import io.github.droidkaigi.confsched2019.session.ui.store.SessionContentsStore
 import io.github.droidkaigi.confsched2019.session.ui.widget.DaggerFragment
 import javax.inject.Inject
@@ -49,6 +52,15 @@ class SpeakerFragment : DaggerFragment() {
         val speakerId = speakerFragmentArgs.speaker
         binding.lang = defaultLang()
         binding.timeZoneOffset = DateTimeSpan(hours = 9) // FIXME Get from device setting
+        binding.listener = object : ImageLoadListener {
+            override fun onImageLoaded() {
+                startPostponedEnterTransition()
+            }
+
+            override fun onImageLoadFailed() {
+                startPostponedEnterTransition()
+            }
+        }
         sessionContentsStore.speaker(speakerId).changed(
             this
         ) { speaker ->
@@ -66,6 +78,11 @@ class SpeakerFragment : DaggerFragment() {
                 )
             )
         }
+        sharedElementEnterTransition =
+            TransitionInflater.from(context).inflateTransition(R.transition.speaker_shared_enter)
+        enterTransition = Fade()
+        returnTransition = null
+        postponeEnterTransition()
     }
 }
 

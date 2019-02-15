@@ -11,9 +11,9 @@ android.libraryVariants.all {
 }
 
 dependencies {
-    implementation project(':ext:android-extension')
+    implementation project(':data:device')
     implementation project(':ext:log')
-    implementation project(':frontendcomponent:androidcomponent')
+    implementation project(':corecomponent:androidcomponent')
 
     implementation Dep.Kotlin.stdlibJvm
     api Dep.Kotlin.coroutines

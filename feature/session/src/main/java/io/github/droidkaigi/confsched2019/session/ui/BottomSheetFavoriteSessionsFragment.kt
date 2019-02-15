@@ -16,7 +16,7 @@ import com.xwray.groupie.Item
 import com.xwray.groupie.databinding.ViewHolder
 import dagger.Module
 import dagger.Provides
-import io.github.droidkaigi.confsched2019.ext.android.changed
+import io.github.droidkaigi.confsched2019.ext.changed
 import io.github.droidkaigi.confsched2019.model.ServiceSession
 import io.github.droidkaigi.confsched2019.model.Session
 import io.github.droidkaigi.confsched2019.model.SessionPage
@@ -63,6 +63,15 @@ class BottomSheetFavoriteSessionsFragment : DaggerFragment() {
 
     private val groupAdapter
         get() = binding.sessionsRecycler.adapter as GroupAdapter<*>
+
+    private val onBackPressedListener = {
+        if (binding.isCollapsed == true) {
+            sessionPageActionCreator.toggleFilterExpanded(SessionPage.Favorite)
+            true
+        } else {
+            false
+        }
+    }
 
     override fun onCreateView(
         inflater: LayoutInflater,
@@ -153,6 +162,16 @@ class BottomSheetFavoriteSessionsFragment : DaggerFragment() {
                 binding.isCollapsed = isCollapsed
             }
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+        activity?.addOnBackPressedCallback(onBackPressedListener)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        activity?.removeOnBackPressedCallback(onBackPressedListener)
     }
 
     override fun onDestroyView() {

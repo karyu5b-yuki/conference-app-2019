@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
+import androidx.activity.OnBackPressedCallback
 import androidx.core.view.isVisible
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.RecyclerView
@@ -13,7 +14,7 @@ import com.shopify.livedataktx.observe
 import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.Item
 import com.xwray.groupie.databinding.ViewHolder
-import io.github.droidkaigi.confsched2019.ext.android.changed
+import io.github.droidkaigi.confsched2019.ext.changed
 import io.github.droidkaigi.confsched2019.model.ServiceSession
 import io.github.droidkaigi.confsched2019.model.Session
 import io.github.droidkaigi.confsched2019.model.SessionPage
@@ -22,6 +23,7 @@ import io.github.droidkaigi.confsched2019.session.R
 import io.github.droidkaigi.confsched2019.session.databinding.FragmentBottomSheetSessionsBinding
 import io.github.droidkaigi.confsched2019.session.ui.actioncreator.SessionContentsActionCreator
 import io.github.droidkaigi.confsched2019.session.ui.actioncreator.SessionPageActionCreator
+import io.github.droidkaigi.confsched2019.session.ui.actioncreator.SessionPagesActionCreator
 import io.github.droidkaigi.confsched2019.session.ui.item.ServiceSessionItem
 import io.github.droidkaigi.confsched2019.session.ui.item.SessionItem
 import io.github.droidkaigi.confsched2019.session.ui.item.SpeechSessionItem
@@ -42,6 +44,7 @@ class BottomSheetDaySessionsFragment : DaggerFragment() {
     @Inject lateinit var sessionContentsActionCreator: SessionContentsActionCreator
     @Inject lateinit var sessionContentsStore: SessionContentsStore
     @Inject lateinit var sessionPageActionCreator: SessionPageActionCreator
+    @Inject lateinit var sessionPagesActionCreator: SessionPagesActionCreator
     @Inject lateinit var sessionPageFragmentProvider: Provider<SessionPageFragment>
     @Inject lateinit var speechSessionItemFactory: SpeechSessionItem.Factory
     @Inject lateinit var sessionPageStoreFactory: SessionPageStore.Factory
@@ -59,6 +62,15 @@ class BottomSheetDaySessionsFragment : DaggerFragment() {
 
     private val args: BottomSheetDaySessionsFragmentArgs by lazy {
         BottomSheetDaySessionsFragmentArgs.fromBundle(arguments ?: Bundle())
+    }
+
+    private val onBackPressedListener = OnBackPressedCallback {
+        if (binding.isCollapsed == true) {
+            sessionPageActionCreator.toggleFilterExpanded(SessionPage.pageOfDay(args.day))
+            true
+        } else {
+            false
+        }
     }
 
     override fun onCreateView(
@@ -130,6 +142,11 @@ class BottomSheetDaySessionsFragment : DaggerFragment() {
                 ?.session
                 ?.startDayText ?: return@changed
             binding.sessionsBottomSheetTitle.text = titleText
+
+            if (sessionPagesStore.sessionScrollAdjusted.value == false) {
+                scrollToCurrentSession()
+                sessionPagesActionCreator.dispatchSessionScrollAdjusted()
+            }
         }
         sessionPagesStore.filters.changed(viewLifecycleOwner) {
             binding.isFiltered = it.isFiltered()
@@ -154,15 +171,29 @@ class BottomSheetDaySessionsFragment : DaggerFragment() {
         }
     }
 
+    override fun onResume() {
+        super.onResume()
+        activity?.addOnBackPressedCallback(onBackPressedListener)
+    }
+
+    override fun onPause() {
+        super.onPause()
+        activity?.removeOnBackPressedCallback(onBackPressedListener)
+    }
+
     override fun onDestroyView() {
         binding.sessionsRecycler.adapter = null
         super.onDestroyView()
     }
 
     private fun scrollToCurrentSession() {
+        val targetSession = sessionPagesStore.filteredSessions.value.orEmpty()
+            .filter { session -> session.isOnGoing }
+            .distinctBy { session -> session.startTime }
+            .lastOrNull()
         val position = sessionPagesStore.filteredSessions.value.orEmpty()
             .filter { session -> session.dayNumber == args.day }
-            .indexOfFirst { session -> session.isOnGoing }
+            .indexOf(targetSession)
         binding.sessionsRecycler.scrollToPosition(position)
     }
 

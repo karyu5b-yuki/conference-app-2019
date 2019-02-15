@@ -5,7 +5,7 @@ import io.github.droidkaigi.confsched2019.action.Action
 import io.github.droidkaigi.confsched2019.data.repository.SessionRepository
 import io.github.droidkaigi.confsched2019.di.PageScope
 import io.github.droidkaigi.confsched2019.dispatcher.Dispatcher
-import io.github.droidkaigi.confsched2019.ext.android.coroutineScope
+import io.github.droidkaigi.confsched2019.ext.coroutineScope
 import io.github.droidkaigi.confsched2019.model.LoadingState
 import io.github.droidkaigi.confsched2019.model.Message
 import io.github.droidkaigi.confsched2019.model.Session
@@ -68,10 +68,12 @@ class SessionContentsActionCreator @Inject constructor(
     fun toggleFavorite(session: Session) {
         launch {
             try {
+                dispatcher.dispatchLoadingState(LoadingState.LOADING)
                 sessionRepository.toggleFavorite(session)
                 sessionAlarm.toggleRegister(session)
                 val sessionContents = sessionRepository.sessionContents()
                 dispatcher.dispatch(Action.SessionContentsLoaded(sessionContents))
+                dispatcher.dispatchLoadingState(LoadingState.LOADED)
             } catch (e: Exception) {
                 dispatcher.dispatch(
                     Action.ShowProcessingMessage(

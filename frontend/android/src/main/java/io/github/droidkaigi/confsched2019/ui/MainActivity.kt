@@ -1,11 +1,12 @@
 package io.github.droidkaigi.confsched2019.ui
 
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.PorterDuff
 import android.os.Bundle
 import android.view.MenuItem
 import android.view.View
-import android.widget.Toast
+import androidx.annotation.IdRes
 import androidx.core.content.ContextCompat
 import androidx.core.view.GravityCompat
 import androidx.core.view.ViewCompat
@@ -33,9 +34,12 @@ import io.github.droidkaigi.confsched2019.about.ui.AboutFragment
 import io.github.droidkaigi.confsched2019.about.ui.AboutFragmentModule
 import io.github.droidkaigi.confsched2019.announcement.ui.AnnouncementFragment
 import io.github.droidkaigi.confsched2019.announcement.ui.AnnouncementFragmentModule
+import io.github.droidkaigi.confsched2019.contributor.ContributorFragment
+import io.github.droidkaigi.confsched2019.contributor.ContributorFragmentModule
+import io.github.droidkaigi.confsched2019.contributor.di.ContributorAssistedInjectModule
 import io.github.droidkaigi.confsched2019.databinding.ActivityMainBinding
 import io.github.droidkaigi.confsched2019.di.PageScope
-import io.github.droidkaigi.confsched2019.ext.android.changed
+import io.github.droidkaigi.confsched2019.ext.changed
 import io.github.droidkaigi.confsched2019.floormap.ui.FloorMapFragment
 import io.github.droidkaigi.confsched2019.floormap.ui.FloorMapFragmentModule
 import io.github.droidkaigi.confsched2019.model.Message
@@ -56,6 +60,7 @@ import io.github.droidkaigi.confsched2019.staff.ui.StaffSearchFragment
 import io.github.droidkaigi.confsched2019.staff.ui.StaffSearchFragmentModule
 import io.github.droidkaigi.confsched2019.survey.ui.SessionSurveyFragment
 import io.github.droidkaigi.confsched2019.survey.ui.SessionSurveyFragmentModule
+import io.github.droidkaigi.confsched2019.system.actioncreator.ActivityActionCreator
 import io.github.droidkaigi.confsched2019.system.store.SystemStore
 import io.github.droidkaigi.confsched2019.ui.widget.StatusBarColorManager
 import io.github.droidkaigi.confsched2019.user.actioncreator.UserActionCreator
@@ -74,6 +79,7 @@ class MainActivity : DaggerAppCompatActivity() {
     @Inject lateinit var userActionCreator: UserActionCreator
     @Inject lateinit var systemStore: SystemStore
     @Inject lateinit var userStore: UserStore
+    @Inject lateinit var activityActionCreator: ActivityActionCreator
 
     private val navController: NavController by lazy {
         findNavController(R.id.root_nav_host_fragment)
@@ -89,8 +95,18 @@ class MainActivity : DaggerAppCompatActivity() {
         setupStatusBarColors()
 
         systemStore.message.changed(this) { message ->
+            if (message == null) {
+                return@changed
+            }
+
             val messageStr: String = when (message) {
-                is Message.ResourceIdMessage -> getString(message.messageId)
+                is Message.ResourceIdMessage -> {
+                    if (message.stringArgs.isEmpty()) {
+                        getString(message.messageId)
+                    } else {
+                        getString(message.messageId, *message.stringArgs)
+                    }
+                }
                 is Message.TextMessage -> message.message
             }
             Snackbar.make(binding.root, messageStr, Snackbar.LENGTH_LONG).show()
@@ -102,8 +118,16 @@ class MainActivity : DaggerAppCompatActivity() {
         }
     }
 
+    override fun onNewIntent(intent: Intent?) {
+        super.onNewIntent(intent)
+        setIntent(intent)
+
+        navController.handleDeepLink(intent)
+    }
+
     private fun setupNavigation() {
-        val topLevelDestinationIds = setOf(R.id.main, R.id.about, R.id.announce, R.id.setting)
+        val topLevelDestinationIds = setOf(R.id.main, R.id.about, R.id.announce, R.id.setting,
+            R.id.floormap, R.id.sponsor, R.id.contributor)
         val appBarConfiguration = AppBarConfiguration(
             topLevelDestinationIds,
             binding.drawerLayout
@@ -121,8 +145,10 @@ class MainActivity : DaggerAppCompatActivity() {
             // to avoid flickering, set current fragment background color to white
             // see https://github.com/DroidKaigi/conference-app-2019/pull/521
             supportFragmentManager.findFragmentById(R.id.root_nav_host_fragment)?.let { host ->
-                host.childFragmentManager
-                    .primaryNavigationFragment?.view?.setBackgroundColor(Color.WHITE)
+                val current = host.childFragmentManager.primaryNavigationFragment
+                if (current !is SessionPagesFragment) {
+                    current?.view?.setBackgroundColor(Color.WHITE)
+                }
             }
 
             val config = PageConfiguration.getConfiguration(destination.id)
@@ -162,7 +188,7 @@ class MainActivity : DaggerAppCompatActivity() {
             }
         }
         binding.navViewFooter.setOnClickListener {
-            Toast.makeText(this, "not url decided", Toast.LENGTH_SHORT).show()
+            activityActionCreator.openUrl("https://goo.gl/forms/FIb5p75kN4X3WY7d2")
         }
     }
 
@@ -188,7 +214,7 @@ class MainActivity : DaggerAppCompatActivity() {
                 binding.drawerLayout.closeDrawer(binding.navView)
             }
             // navigate
-            val handled = handleNavigation(item)
+            val handled = handleNavigation(item.itemId)
             // check current displayed item in navigation menu / uncheck others
             checkCurrentDestinationIdInDrawer(item.itemId)
 
@@ -213,15 +239,15 @@ class MainActivity : DaggerAppCompatActivity() {
         }
     }
 
-    private fun handleNavigation(item: MenuItem): Boolean {
+    private fun handleNavigation(@IdRes itemId: Int): Boolean {
         return try {
             // ignore if current destination is selected
-            if (navController.currentDestination?.id == item.itemId) return false
+            if (navController.currentDestination?.id == itemId) return false
             val builder = NavOptions.Builder()
                 .setLaunchSingleTop(true)
                 .setPopUpTo(R.id.main, false)
             val options = builder.build()
-            navController.navigate(item.itemId, null, options)
+            navController.navigate(itemId, null, options)
             true
         } catch (e: IllegalArgumentException) {
             false
@@ -229,7 +255,7 @@ class MainActivity : DaggerAppCompatActivity() {
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
-        return handleNavigation(item) || super.onOptionsItemSelected(item)
+        return handleNavigation(item.itemId) || super.onOptionsItemSelected(item)
     }
 
     override fun onBackPressed() {
@@ -300,6 +326,12 @@ abstract class MainActivityModule {
     @PageScope
     @ContributesAndroidInjector(modules = [StaffSearchFragmentModule::class])
     abstract fun contributeStaffSearchFragment(): StaffSearchFragment
+
+    @PageScope
+    @ContributesAndroidInjector(
+        modules = [ContributorFragmentModule::class, ContributorAssistedInjectModule::class]
+    )
+    abstract fun contrbutorContributorFragment(): ContributorFragment
 
     @Module
     companion object {

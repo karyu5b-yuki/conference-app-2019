@@ -2,15 +2,18 @@
 
 [DroidKaigi 2019](https://droidkaigi.jp/2019/en/) is a conference tailored for developers on 7th and 8th February 2019.
 
-You can download the binary built on master branch from [<img src="https://dply.me/t6sc7f/button/large" alt="Try it on your device via DeployGate">](https://dply.me/t6sc7f#install)
+You can install the prodution app via <a href='https://play.google.com/store/apps/details?id=io.github.droidkaigi.confsched2019&pcampaignid=MKT-Other-global-all-co-prtnr-py-PartBadge-Mar2515-1'><img width="135px" alt='Get it on Google Play' src='https://play.google.com/intl/ja/badges/images/generic/en_badge_web_generic.png'/></a>.
+
+And also, you can try the binary under development built on master branch through [<img src="https://dply.me/t6sc7f/button/large" alt="Try it on your device via DeployGate">](https://dply.me/t6sc7f#install)
 
 NOTE: Google Play Protect will show a warning dialog on some of devices when installing the current apk. The detailed specification of Google Play Protect is not public so we cannot address this matter. Please ignore the dialog for now. If you cannot install this apk without any error message, please disable Google Play Protect from Google Play Store's menus. Sorry for the inconvenience.
 
 # Features
 
-| top | detail |
-|---|---|
-| ![image](https://user-images.githubusercontent.com/1386930/50733191-7080ca80-11cc-11e9-8631-0a032c7b6430.png) | ![image](https://user-images.githubusercontent.com/1386930/50731924-ccd6f080-11b2-11e9-8f15-3e09833f2072.png) |
+| top | timetable | search |
+|---|---|---|
+| ![image](https://user-images.githubusercontent.com/1386930/52349238-738c0680-2a69-11e9-8b6d-7c1b2587e9ac.png) | ![image](https://user-images.githubusercontent.com/1386930/52349352-bc43bf80-2a69-11e9-9bf8-bad3948dbca7.png) | ![image](https://user-images.githubusercontent.com/1386930/52349402-d7163400-2a69-11e9-9a33-175b1b27427b.png) |
+
 
 * View conference schedule and details of each session
 * Set notification for upcoming sessions on your preference
@@ -21,19 +24,25 @@ NOTE: Google Play Protect will show a warning dialog on some of devices when ins
 
 We always welcome any and all contributions! See [CONTRIBUTING.md](CONTRIBUTING.md) for more information
 
+We would be happy if you ran the command below before sending pull requests to install git hooks. Thanks.
+
+```
+./scripts/git/install.bash
+```
+
 ## Requirements
 
-- Android Studio 3.4 Beta 2 and higher.
+- Android Studio 3.4 Beta 3 and higher. You can download it from [this page](https://developer.android.com/studio/archive?hl=en).
 - Android Studio Kotlin Plugin v1.3.20-release-Studio<AS version>
 
 **Check out following status.**  
 
 * Use recent version of Android Studio Kotlin Plugin
 
-`Preference` > `Languages & Frameworks` > `Kotlin Updates`
+`Preferences` > `Languages & Frameworks` > `Kotlin Updates`
 
 Older versions of the Kotlin plugin may cause build failures.
-If you still have a trouble after upgrading the plugin, please try using AndroidStudio 3.3 or 3.4 instead.
+If you still have a trouble after upgrading the plugin, please try using AndroidStudio 3.4 instead.
 
 * Disable Instant Run
 
@@ -174,15 +183,15 @@ This store is a `ViewModel`. But if the store is used by the whole application(e
 ```kotlin
 class AnnouncementStore @Inject constructor(
     dispatcher: Dispatcher
-) : ViewModel() {
+) : Store() {
     val loadingState: LiveData<LoadingState> = dispatcher
         .subscribe<Action.AnnouncementLoadingStateChanged>()
         .map { it.loadingState }
-        .toLiveData(LoadingState.LOADING)
+        .toLiveData(this, LoadingState.LOADING)
     val announcements: LiveData<List<Announcement>> = dispatcher
         .subscribe<Action.AnnouncementLoaded>()
         .map { it.announcements }
-        .toLiveData(listOf())
+        .toLiveData(this, listOf())
 }
 ```
 
@@ -267,6 +276,7 @@ This project uses some modern Android libraries and source codes.
 * [Injected ViewModel Provider](https://github.com/evant/injectedvmprovider) (evant)
 * [Google I/O 2018](https://github.com/google/iosched) (Google)
 * [Picasso](http://square.github.io/picasso/) (Square)
+* [TimetableLayout](https://github.com/MoyuruAizawa/TimetableLayout) (MoyuruAizawa)
 
 ### iOS
 

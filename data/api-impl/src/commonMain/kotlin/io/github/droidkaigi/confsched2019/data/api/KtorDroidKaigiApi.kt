@@ -3,6 +3,9 @@ package io.github.droidkaigi.confsched2019.data.api
 import io.github.droidkaigi.confsched2019.data.api.parameter.LangParameter
 import io.github.droidkaigi.confsched2019.data.api.response.AnnouncementListResponse
 import io.github.droidkaigi.confsched2019.data.api.response.AnnouncementResponseImpl
+import io.github.droidkaigi.confsched2019.data.api.response.ContributorItemResponseImpl
+import io.github.droidkaigi.confsched2019.data.api.response.ContributorResponse
+import io.github.droidkaigi.confsched2019.data.api.response.ContributorResponseImpl
 import io.github.droidkaigi.confsched2019.data.api.response.Response
 import io.github.droidkaigi.confsched2019.data.api.response.ResponseImpl
 import io.github.droidkaigi.confsched2019.data.api.response.SponsorResponse
@@ -28,7 +31,6 @@ open class KtorDroidKaigiApi constructor(
     val apiEndpoint: String,
     val coroutineDispatcherForCallback: CoroutineContext?
 ) : DroidKaigiApi {
-
     override suspend fun getSessions(): Response {
         // We are separate getting response string and parsing for Kotlin Native
         val rawResponse = httpClient.get<String> {
@@ -57,6 +59,11 @@ open class KtorDroidKaigiApi constructor(
             getSessions()
         }
 
+    override fun getAnnouncementsAsync(lang: LangParameter): Deferred<AnnouncementListResponse> =
+        GlobalScope.async(requireNotNull(coroutineDispatcherForCallback)) {
+            getAnnouncements(lang)
+        }
+
     override suspend fun getAnnouncements(lang: LangParameter): AnnouncementListResponse {
         val rawResponse = httpClient.get<String> {
             url("$apiEndpoint/announcements?language=${lang.name}")
@@ -82,5 +89,19 @@ open class KtorDroidKaigiApi constructor(
         }
 
         return StaffResponseImpl(JSON.parse(StaffItemResponseImpl.serializer().list, rawResponse))
+    }
+
+    override suspend fun getContributorList(): ContributorResponse {
+        val rawResponse = httpClient.get<String> {
+            url("$apiEndpoint/contributors")
+            accept(ContentType.Application.Json)
+        }
+
+        return ContributorResponseImpl(
+            JSON.parse(
+                ContributorItemResponseImpl.serializer().list,
+                rawResponse
+            )
+        )
     }
 }
