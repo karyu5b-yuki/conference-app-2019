@@ -5,7 +5,7 @@ import android.os.Bundle
 import androidx.preference.PreferenceFragmentCompat
 import io.github.droidkaigi.confsched2019.settings.R
 import io.github.droidkaigi.confsched2019.action.Action
-import io.github.droidkaigi.confsched2019.ext.android.changed
+import io.github.droidkaigi.confsched2019.ext.changed
 import io.github.droidkaigi.confsched2019.system.actioncreator.PreferenceActionCreator
 import me.tatarka.injectedvmprovider.InjectedViewModelProviders
 import javax.inject.Inject
@@ -28,7 +28,8 @@ class SettingsFragment : PreferenceFragmentCompat(),
         super.onCreate(savedInstanceState)
         preferenceScreen.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
         settingsStore.settingsResult.changed(viewLifecycleOwner) { settingsContents ->
-            settingsContents[0]
+            // settingsStore.settingsResultの返り値がList<Any>となっているので、型をつけてください。
+            // settingsContents[0]
         }
             // TODO 流れてきたら更新 xmlに記載しているswitchのidを取得して、bindする。
             // 対応するswitchのon offを変更する。
