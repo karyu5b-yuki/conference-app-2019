@@ -28,16 +28,22 @@ class SettingsFragment : PreferenceFragmentCompat(),
         super.onCreate(savedInstanceState)
         preferenceScreen.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
         settingsStore.settingsResult.changed(viewLifecycleOwner) { settingsContents ->
+            settingsContents
             // settingsStore.settingsResultの返り値がList<Any>となっているので、型をつけてください。
             // settingsContents[0]
         }
             // TODO 流れてきたら更新 xmlに記載しているswitchのidを取得して、bindする。
+            /* val preferenceList = <Listをとる何か>
+               val switches = [各switchのidを調べて、switchの配列を作る]
+               for i in 0..3 {
+                 if(preferenceList[i]) {
+                    switches[i].switchOn
+                 } else {
+                    switches[i].switchOff
+                 }
+               }
+             */
             // 対応するswitchのon offを変更する。
-           /* settingsResult[]
-            "@string/session_title_key",checkboxのon/offによるbool値
-            "@string/session_url_key",
-            "@string/event_hashtag_key",
-            "@string/room_hashtag_key"*/
 //        }
     }
 
@@ -48,14 +54,24 @@ class SettingsFragment : PreferenceFragmentCompat(),
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        val changed = sharedPreferences?.getBoolean(
-            key, false
+        val changed_title = sharedPreferences?.getBoolean(
+            "session_title", false
         )
+        val  changed_url= sharedPreferences?.getBoolean(
+            "session_url", false
+        )
+        val  changed_event= sharedPreferences?.getBoolean(
+            "event_hashtag", false
+        )
+        val  changed_room= sharedPreferences?.getBoolean(
+            "room_hashtag", false
+        )
+
         // TODO: SettingContentsChangedをインスタンス化し、submitする。
         // 以下を行う際には、既存の4つの値のうち、変更されたものだけを更新して配列をコンストラクタの引数として渡す。
         // SettingContentsChanged(listof(true, true, true, false))みたいな感じ。実際は変数で置く。
         // NOTE: 実際にpreferenceActionCreator.submit()で行なっている処理は、dispatcherがactionを伝えること。
-        preferenceActionCreator.submit(Action.SettingContentsChanged(mutableListOf()))
+        preferenceActionCreator.submit(Action.SettingContentsChanged(arrayOf(changed_title, changed_url, changed_event, changed_room)))
 
     }
 
