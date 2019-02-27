@@ -71,8 +71,24 @@ class SettingsFragment : PreferenceFragmentCompat(),
         // 以下を行う際には、既存の4つの値のうち、変更されたものだけを更新して配列をコンストラクタの引数として渡す。
         // SettingContentsChanged(listof(true, true, true, false))みたいな感じ。実際は変数で置く。
         // NOTE: 実際にpreferenceActionCreator.submit()で行なっている処理は、dispatcherがactionを伝えること。
-        preferenceActionCreator.submit(Action.SettingContentsChanged(arrayOf(changed_title, changed_url, changed_event, changed_room)))
+        preferenceActionCreator.submit(Action.SettingContentsChanged(
+            settingContent(
+                changed_title,
+                changed_url,
+                changed_event,
+                changed_room
+            )
+        ))
+
 
     }
-
+/*
+    private fun settingContent(
+        changed_title: Boolean?,
+        changed_url: Boolean?,
+        changed_event: Boolean?,
+        changed_room: Boolean?
+    ): MutableMap<Any, Any> =
+        mutableMapOf(changed_title, changed_url, changed_event, changed_room)
 }
+*/

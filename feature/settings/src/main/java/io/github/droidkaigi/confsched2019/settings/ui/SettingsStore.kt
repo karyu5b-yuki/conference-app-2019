@@ -14,7 +14,9 @@ class SettingsStore @Inject constructor(
     dispatcher: Dispatcher
 ) : Store() {
 
-    val settingsResult : List<SettingContent> = dispatcher
+    val settingsResult : List<SettingContent> = dispatcher //mutableMapOf<>
+    // as 使うのどこやろ　val settingsResult = as? Boolean
+        //if (amy is onSharedPreferenceChanged){ ??
         // subscribeのあとに帰ってくるdataの形は、
         // data class SettingContentsLoaded(
         // val contents: List<SettingContent>
