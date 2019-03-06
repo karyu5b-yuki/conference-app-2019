@@ -21,7 +21,6 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
         addPreferencesFromResource(R.xml.preferences)
-
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -29,21 +28,19 @@ class SettingsFragment : PreferenceFragmentCompat(),
         preferenceScreen.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
         settingsStore.settingsResult.changed(viewLifecycleOwner) { settingsContents ->
             settingsContents
-            // settingsStore.settingsResultの返り値がList<Any>となっているので、型をつけてください。
-            // settingsContents[0]
         }
-            // TODO 流れてきたら更新 xmlに記載しているswitchのidを取得して、bindする。
-            /* val preferenceList = <Listをとる何か>
-               val switches = [各switchのidを調べて、switchの配列を作る]
-               for i in 0..3 {
-                 if(preferenceList[i]) {
-                    switches[i].switchOn
-                 } else {
-                    switches[i].switchOff
-                 }
-               }
-             */
-            // 対応するswitchのon offを変更する。
+        // TODO 流れてきたら更新 xmlに記載しているswitchのidを取得して、bindする。
+        /* val preferenceList = <Listをとる何か>
+           val switches = [各switchのidを調べて、switchの配列を作る]
+           for i in 0..3 {
+             if(preferenceList[i]) {
+                switches[i].switchOn
+             } else {
+                switches[i].switchOff
+             }
+           }
+         */
+        // 対応するswitchのon offを変更する。
 //        }
     }
 
@@ -71,16 +68,8 @@ class SettingsFragment : PreferenceFragmentCompat(),
         // 以下を行う際には、既存の4つの値のうち、変更されたものだけを更新して配列をコンストラクタの引数として渡す。
         // SettingContentsChanged(listof(true, true, true, false))みたいな感じ。実際は変数で置く。
         // NOTE: 実際にpreferenceActionCreator.submit()で行なっている処理は、dispatcherがactionを伝えること。
-        preferenceActionCreator.submit(Action.SettingContentsChanged(
-            settingContent(
-                changed_title,
-                changed_url,
-                changed_event,
-                changed_room
-            )
-        ))
-
-
+        preferenceActionCreator.submit(Action.SettingContentsChanged()
+        )
     }
 /*
     private fun settingContent(

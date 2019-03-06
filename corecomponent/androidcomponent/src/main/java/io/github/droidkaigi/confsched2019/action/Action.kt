@@ -93,12 +93,6 @@ sealed class Action {
 
     class FloorMapLoadingStateChanged(val loadingState: LoadingState) : Action()
 
-    data class SettingContentsChanged(val contents: Array<Boolean?>) : Action()
+    data class SettingContentsChanged(val contents :) : Action()
 
-}
-
-data class SettingContent(val value: Boolean) {
-    companion object {
-        val EMPTY = SettingContent(false)
-    }
 }

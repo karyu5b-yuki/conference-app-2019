@@ -1,9 +1,10 @@
 package io.github.droidkaigi.confsched2019.settings.ui
 
+import androidx.lifecycle.LiveData
 import io.github.droidkaigi.confsched2019.action.Action
-import io.github.droidkaigi.confsched2019.action.SettingContent
 import io.github.droidkaigi.confsched2019.dispatcher.Dispatcher
 import io.github.droidkaigi.confsched2019.ext.toLiveData
+import io.github.droidkaigi.confsched2019.model.SettingContents
 import io.github.droidkaigi.confsched2019.store.Store
 import kotlinx.coroutines.channels.map
 import javax.inject.Inject
@@ -14,9 +15,7 @@ class SettingsStore @Inject constructor(
     dispatcher: Dispatcher
 ) : Store() {
 
-    val settingsResult : List<SettingContent> = dispatcher //mutableMapOf<>
-    // as 使うのどこやろ　val settingsResult = as? Boolean
-        //if (amy is onSharedPreferenceChanged){ ??
+    val settingsResult : LiveData<SettingContents> = dispatcher
         // subscribeのあとに帰ってくるdataの形は、
         // data class SettingContentsLoaded(
         // val contents: List<SettingContent>
@@ -24,5 +23,6 @@ class SettingsStore @Inject constructor(
         .subscribe<Action.SettingContentsChanged>()
         // mapは変換するという意味。Action..SettingContentsLoadedから利用したいcontentsを取得して、伝搬したい。
         .map { it.contents }
-        .toLiveData(this, SettingContent.EMPTY)
+        .toLiveData(this, null)
 }
+
