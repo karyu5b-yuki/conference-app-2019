@@ -22,7 +22,7 @@ class SettingsStore @Inject constructor(
         // ) : Action()
         .subscribe<Action.SettingContentsChanged>()
         // mapは変換するという意味。Action..SettingContentsLoadedから利用したいcontentsを取得して、伝搬したい。
-        .map { it.contents }
+        .map { SettingContents(it.contents) }
         .toLiveData(this, null)
 }
 

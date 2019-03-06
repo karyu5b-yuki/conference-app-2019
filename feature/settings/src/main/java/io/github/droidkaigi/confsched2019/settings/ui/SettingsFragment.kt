@@ -2,6 +2,7 @@ package io.github.droidkaigi.confsched2019.settings.ui
 
 import android.content.SharedPreferences
 import android.os.Bundle
+import androidx.core.content.edit
 import androidx.preference.PreferenceFragmentCompat
 import io.github.droidkaigi.confsched2019.settings.R
 import io.github.droidkaigi.confsched2019.action.Action
@@ -27,7 +28,11 @@ class SettingsFragment : PreferenceFragmentCompat(),
         super.onCreate(savedInstanceState)
         preferenceScreen.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
         settingsStore.settingsResult.changed(viewLifecycleOwner) { settingsContents ->
-            settingsContents
+            for (content in settingsContents.preferences){
+                content.key
+                content.value
+
+            }
         }
         // TODO 流れてきたら更新 xmlに記載しているswitchのidを取得して、bindする。
         /* val preferenceList = <Listをとる何か>
@@ -51,6 +56,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
+        val contents = mutableMapOf<String, Boolean?>()
         val changed_title = sharedPreferences?.getBoolean(
             "session_title", false
         )
@@ -64,12 +70,13 @@ class SettingsFragment : PreferenceFragmentCompat(),
             "room_hashtag", false
         )
 
-        // TODO: SettingContentsChangedをインスタンス化し、submitする。
+        contents["session_title"] = changed_title
+
+            // TODO: SettingContentsChangedをインスタンス化し、submitする。
         // 以下を行う際には、既存の4つの値のうち、変更されたものだけを更新して配列をコンストラクタの引数として渡す。
         // SettingContentsChanged(listof(true, true, true, false))みたいな感じ。実際は変数で置く。
         // NOTE: 実際にpreferenceActionCreator.submit()で行なっている処理は、dispatcherがactionを伝えること。
-        preferenceActionCreator.submit(Action.SettingContentsChanged()
-        )
+        preferenceActionCreator.submit(Action.SettingContentsChanged(contents))
     }
 /*
     private fun settingContent(
@@ -80,4 +87,13 @@ class SettingsFragment : PreferenceFragmentCompat(),
     ): MutableMap<Any, Any> =
         mutableMapOf(changed_title, changed_url, changed_event, changed_room)
 }
+
+    preferenceActionCreator.submit(Action.SettingContentsChanged(
+    -            settingContent(
+    -                changed_title,
+    -                changed_url,
+    -                changed_event,
+    -                changed_room
+    -            )
+    -        ))
 */

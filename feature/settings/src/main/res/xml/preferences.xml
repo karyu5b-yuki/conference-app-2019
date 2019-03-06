@@ -7,24 +7,20 @@
         android:key="@string/session_title_key"
         android:title="@string/session_title_title"
         android:summaryOn="@string/session_title_summary_true"
-        android:summaryOff="@string/session_title_summary_false"
         android:defaultValue="@bool/session_title_default" />
     <CheckBoxPreference
         android:key="@string/session_url_key"
         android:title="@string/session_url_title"
         android:summaryOn="@string/session_url_summary_true"
-        android:summaryOff="@string/session_url_summary_false"
         android:defaultValue="@bool/session_url_default" />
     <CheckBoxPreference
         android:key="@string/event_hashtag_key"
         android:title="@string/event_hashtag_title"
         android:summaryOn="@string/event_hashtag_summary_true"
-        android:summaryOff="@string/event_hashtag_summary_false"
         android:defaultValue="@bool/event_hashtag_default" />
     <CheckBoxPreference
         android:key="@string/room_hashtag_key"
         android:title="@string/room_hashtag_title"
         android:summaryOn="@string/room_hashtag_summary_true"
-        android:summaryOff="@string/room_hashtag_summary_false"
         android:defaultValue="@bool/room_hashtag_default" />
 </PreferenceScreen>

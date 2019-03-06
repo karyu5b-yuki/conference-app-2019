@@ -13,8 +13,8 @@ import javax.inject.Inject
 class PreferenceActionCreator @Inject constructor(
     val dispatcher: Dispatcher)
     : CoroutineScope by GlobalScope + SupervisorJob() {
-    fun submit(key: String, value: SettingContents)=launch {
-            dispatcher.dispatch(Action.SettingContentsChanged())
+    fun submit(action: Action)=launch {
+            dispatcher.dispatch(action)
 
     }
 }
