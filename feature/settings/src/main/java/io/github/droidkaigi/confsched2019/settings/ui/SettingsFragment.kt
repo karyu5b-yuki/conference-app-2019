@@ -27,11 +27,15 @@ class SettingsFragment : PreferenceFragmentCompat(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         preferenceScreen.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
-        settingsStore.settingsResult.changed(viewLifecycleOwner) { settingsContents ->
+        settingsStore.settingsResult.changed(viewLifecycleOwner) {settingsContents ->
             // settingsStore.settingsResultの返り値がList<Any>となっているので、型をつけてください。
-            // settingsContents[0]
+             settingsContents.preferences["aa"]= true
+
+            //このタイミングでsharedpreference更新。確実にここに変わったやつ着てる。
+            //logで確認。
         }
             // TODO 流れてきたら更新 xmlに記載しているswitchのidを取得して、bindする。
+        //結びつけるとは...?
             // 対応するswitchのon offを変更する。
            /* settingsResult[]
             "@string/session_title_key",checkboxのon/offによるbool値
@@ -42,7 +46,6 @@ class SettingsFragment : PreferenceFragmentCompat(),
     }
 
     override fun onDestroy() {
-        // TODO: ここで、現状のswitchのon, offをSharedPreferenceに保存してあげる。
         preferenceScreen.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
         super.onDestroy()
     }
@@ -55,8 +58,7 @@ class SettingsFragment : PreferenceFragmentCompat(),
         // 以下を行う際には、既存の4つの値のうち、変更されたものだけを更新して配列をコンストラクタの引数として渡す。
         // SettingContentsChanged(listof(true, true, true, false))みたいな感じ。実際は変数で置く。
         // NOTE: 実際にpreferenceActionCreator.submit()で行なっている処理は、dispatcherがactionを伝えること。
-        preferenceActionCreator.submit(Action.SettingContentsChanged(mutableListOf()))
-
+        preferenceActionCreator.submit
     }
 
 }

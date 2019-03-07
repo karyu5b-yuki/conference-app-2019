@@ -15,6 +15,7 @@ import io.github.droidkaigi.confsched2019.model.Session
 import io.github.droidkaigi.confsched2019.model.SessionContents
 import io.github.droidkaigi.confsched2019.model.SessionFeedback
 import io.github.droidkaigi.confsched2019.model.SessionPage
+import io.github.droidkaigi.confsched2019.model.SettingContents
 import io.github.droidkaigi.confsched2019.model.SponsorCategory
 import io.github.droidkaigi.confsched2019.model.StaffContents
 import io.github.droidkaigi.confsched2019.model.StaffSearchResult
@@ -93,12 +94,7 @@ sealed class Action {
 
     class FloorMapLoadingStateChanged(val loadingState: LoadingState) : Action()
 
-    data class SettingContentsChanged(val contents: List<SettingContent>) : Action()
+    data class SettingContentsChanged(val contents: SettingContents) : Action()
 
 }
 
-data class SettingContent(val value: Boolean) {
-    companion object {
-        val EMPTY = SettingContent(false)
-    }
-}
