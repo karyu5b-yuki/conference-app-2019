@@ -10,7 +10,6 @@ import kotlinx.coroutines.channels.map
 import javax.inject.Inject
 import javax.inject.Singleton
 
-@Singleton
 class SettingsStore @Inject constructor(
     dispatcher: Dispatcher
 ) : Store() {
@@ -21,7 +20,6 @@ class SettingsStore @Inject constructor(
         // val contents: List<SettingContent>
         // ) : Action()
         .subscribe<Action.SettingContentsChanged>()
-        // mapは変換するという意味。Action..SettingContentsLoadedから利用したいcontentsを取得して、伝搬したい。
         .map { SettingContents(it.contents) }
         .toLiveData(this, null)
 }

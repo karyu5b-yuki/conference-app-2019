@@ -1,4 +1,4 @@
-package io.github.droidkaigi.confsched2019.system.actioncreator
+package io.github.droidkaigi.confsched2019.settings.ui
 
 import io.github.droidkaigi.confsched2019.action.Action
 import io.github.droidkaigi.confsched2019.dispatcher.Dispatcher
