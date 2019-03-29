@@ -30,7 +30,6 @@ import javax.inject.Inject
 open class App : DaggerApplication() {
     @Inject lateinit var systemStore: SystemStore
     @Inject lateinit var systemActionCreator: SystemActionCreator
-    @Inject lateinit var settingsStore: SettingsStore
 
     override fun onCreate() {
         super.onCreate()

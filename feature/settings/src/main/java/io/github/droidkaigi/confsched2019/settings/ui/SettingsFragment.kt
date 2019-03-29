@@ -3,18 +3,19 @@ package io.github.droidkaigi.confsched2019.settings.ui
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
-import androidx.preference.PreferenceFragmentCompat
+import android.view.View
+import androidx.lifecycle.Lifecycle
 import androidx.preference.PreferenceManager
+import dagger.Module
+import dagger.Provides
 import io.github.droidkaigi.confsched2019.action.Action
+import io.github.droidkaigi.confsched2019.di.PageScope
 import io.github.droidkaigi.confsched2019.ext.changed
-import me.tatarka.injectedvmprovider.InjectedViewModelProviders
 import javax.inject.Inject
-import javax.inject.Provider
 
-
-
-class SettingsFragment : PreferenceFragmentCompat(),
+class SettingsFragment : DaggerFragment(),
     SharedPreferences.OnSharedPreferenceChangeListener {
+
     @Inject lateinit var preferenceActionCreator: PreferenceActionCreator
     @Inject lateinit var settingsStore: SettingsStore
 
@@ -22,13 +23,10 @@ class SettingsFragment : PreferenceFragmentCompat(),
         addPreferencesFromResource(io.github.droidkaigi.confsched2019.settings.R.xml.preferences)
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        preferenceScreen.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
-
-
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
         settingsStore.settingsResult.changed(viewLifecycleOwner) { settingContents ->
-            for (content in settingContents.preferences){
+            for (content in settingContents.preferences) {
                 val editor = PreferenceManager.getDefaultSharedPreferences(context).edit()
                 editor.putBoolean(content.key, content.value ?: false)
                 editor.apply()
@@ -36,7 +34,6 @@ class SettingsFragment : PreferenceFragmentCompat(),
 
             Log.d("settingContents", settingContents.toString())
         }
-
 
         // TODO 流れてきたら更新 xmlに記載しているswitchのidを取得して、bindする。
         /* val preferenceList = <Listをとる何か>
@@ -51,6 +48,11 @@ class SettingsFragment : PreferenceFragmentCompat(),
          */
         // 対応するswitchのon offを変更する。
 //        }
+    }
+
+    override fun onActivityCreated(savedInstanceState: Bundle?) {
+        super.onActivityCreated(savedInstanceState)
+        preferenceScreen.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
     }
 
     override fun onDestroy() {
@@ -84,6 +86,21 @@ class SettingsFragment : PreferenceFragmentCompat(),
         // SettingContentsChanged(listof(true, true, true, false))みたいな感じ。実際は変数で置く。
         // NOTE: 実際にpreferenceActionCreator.submit()で行なっている処理は、dispatcherがactionを伝えること。
         preferenceActionCreator.submit(Action.SettingContentsChanged(contents))
+    }
+}
+
+@Module
+abstract class SettingsFragmentModule {
+    @Module
+    companion object {
+        @PageScope
+        @JvmStatic
+        @Provides
+        fun providesLifecycle(
+            settingsFragment: SettingsFragment
+        ): Lifecycle {
+            return settingsFragment.viewLifecycleOwner.lifecycle
+        }
     }
 }
 /*
