@@ -54,6 +54,8 @@ import io.github.droidkaigi.confsched2019.session.ui.SpeakerFragment
 import io.github.droidkaigi.confsched2019.session.ui.SpeakerFragmentModule
 import io.github.droidkaigi.confsched2019.session.ui.TabularFormSessionPagesFragment
 import io.github.droidkaigi.confsched2019.session.ui.TabularFromSessionPagesFragmentModule
+import io.github.droidkaigi.confsched2019.settings.ui.SettingsFragment
+import io.github.droidkaigi.confsched2019.settings.ui.SettingsFragmentModule
 import io.github.droidkaigi.confsched2019.sponsor.ui.SponsorFragment
 import io.github.droidkaigi.confsched2019.sponsor.ui.SponsorFragmentModule
 import io.github.droidkaigi.confsched2019.staff.ui.StaffSearchFragment
@@ -126,8 +128,10 @@ class MainActivity : DaggerAppCompatActivity() {
     }
 
     private fun setupNavigation() {
-        val topLevelDestinationIds = setOf(R.id.main, R.id.about, R.id.announce, R.id.setting,
-            R.id.floormap, R.id.sponsor, R.id.contributor)
+        val topLevelDestinationIds = setOf(
+            R.id.main, R.id.about, R.id.announce, R.id.setting,
+            R.id.floormap, R.id.sponsor, R.id.contributor
+        )
         val appBarConfiguration = AppBarConfiguration(
             topLevelDestinationIds,
             binding.drawerLayout
@@ -332,6 +336,10 @@ abstract class MainActivityModule {
         modules = [ContributorFragmentModule::class, ContributorAssistedInjectModule::class]
     )
     abstract fun contrbutorContributorFragment(): ContributorFragment
+
+    @PageScope
+    @ContributesAndroidInjector(modules = [SettingsFragmentModule::class])
+    abstract fun contributeSettingsFragement(): SettingsFragment
 
     @Module
     companion object {

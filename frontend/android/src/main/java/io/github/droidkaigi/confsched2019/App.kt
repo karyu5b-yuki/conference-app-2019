@@ -18,6 +18,7 @@ import io.github.droidkaigi.confsched2019.announcement.ui.subscribeAnnouncementT
 import io.github.droidkaigi.confsched2019.di.createAppComponent
 import io.github.droidkaigi.confsched2019.ext.changedForever
 import io.github.droidkaigi.confsched2019.model.SystemProperty
+import io.github.droidkaigi.confsched2019.model.SettingsStore
 import io.github.droidkaigi.confsched2019.system.actioncreator.SystemActionCreator
 import io.github.droidkaigi.confsched2019.system.store.SystemStore
 import timber.log.LogcatTree

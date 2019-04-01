@@ -2,63 +2,84 @@ package io.github.droidkaigi.confsched2019.settings.ui
 
 import android.content.SharedPreferences
 import android.os.Bundle
-import androidx.preference.PreferenceFragmentCompat
-import io.github.droidkaigi.confsched2019.settings.R
+import android.util.Log
+import android.view.View
+import androidx.lifecycle.Lifecycle
+//import androidx.preference.PreferenceActionCreator
+import androidx.preference.PreferenceManager
+import dagger.Module
+import dagger.Provides
 import io.github.droidkaigi.confsched2019.action.Action
-import io.github.droidkaigi.confsched2019.ext.changed
-import io.github.droidkaigi.confsched2019.system.actioncreator.PreferenceActionCreator
-import me.tatarka.injectedvmprovider.InjectedViewModelProviders
+import io.github.droidkaigi.confsched2019.di.PageScope
 import javax.inject.Inject
-import javax.inject.Provider
 
-class SettingsFragment : PreferenceFragmentCompat(),
+class SettingsFragment : DaggerFragment(),
     SharedPreferences.OnSharedPreferenceChangeListener {
     @Inject lateinit var preferenceActionCreator: PreferenceActionCreator
-    @Inject lateinit var settingsStoreProvider: Provider<SettingsStore>
-    private val settingsStore: SettingsStore by lazy {
-        InjectedViewModelProviders.of(requireActivity()).get(settingsStoreProvider)
+    @Inject lateinit var settingsStore: SettingsStore
     }
 
     override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        addPreferencesFromResource(R.xml.preferences)
+        addPreferencesFromResource(io.github.droidkaigi.confsched2019.settings.R.xml.preferences)
 
     }
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        preferenceScreen.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?){
+        super.onViewCreated(view, savedInstanceState)
         settingsStore.settingsResult.changed(viewLifecycleOwner) {settingsContents ->
-            // settingsStore.settingsResultの返り値がList<Any>となっているので、型をつけてください。
-             settingsContents.preferences["aa"]= true
+            for (content in settingContents.preferences) {
+                val editor = PreferenceManager.getDefaultSharedPreferences(context).edit()
+                editor.putBoolean(content.key, content.value ?: false)
+                editor.apply()
+            }
 
-            //このタイミングでsharedpreference更新。確実にここに変わったやつ着てる。
-            //logで確認。
-        }
-            // TODO 流れてきたら更新 xmlに記載しているswitchのidを取得して、bindする。
-        //結びつけるとは...?
-            // 対応するswitchのon offを変更する。
-           /* settingsResult[]
-            "@string/session_title_key",checkboxのon/offによるbool値
-            "@string/session_url_key",
-            "@string/event_hashtag_key",
-            "@string/room_hashtag_key"*/
-//        }
+            Log.d("settingContents", settingContents.toString())
+                 }
     }
 
+    override fun onActivityCreated(savedInstanceState: Bundle?){
+        super.onActivityCreated(savedInstanceState)
+        preferenceScreen.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+
+    }
     override fun onDestroy() {
         preferenceScreen.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
         super.onDestroy()
     }
 
     override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-        val changed = sharedPreferences?.getBoolean(
-            key, false
+        val contents = mutableMapOf<String, Boolean?>()
+        val changed_title = sharedPreferences?. getBoolean(
+            "session_title", false
         )
-        // TODO: SettingContentsChangedをインスタンス化し、submitする。
-        // 以下を行う際には、既存の4つの値のうち、変更されたものだけを更新して配列をコンストラクタの引数として渡す。
-        // SettingContentsChanged(listof(true, true, true, false))みたいな感じ。実際は変数で置く。
-        // NOTE: 実際にpreferenceActionCreator.submit()で行なっている処理は、dispatcherがactionを伝えること。
-        preferenceActionCreator.submit
-    }
+        val changed_url = sharedPreferences?. getBoolean(
+            "session_url", false
+        )
+        val changed_event = sharedPreferences?.getBoolean(
+            "event_hashtag", false
+        )
+        val changed_room = sharedPreferences?.getBoolean(
+            "room_hashtag", false
+        )
 
+        contents["session_title"] = changed_title
+        contents["session_url"] = changed_url
+        contents["event_hashtag"] = changed_event
+        contents["room_hashtag"] = changed_room
+
+        preferenceActionCreator.submit(Action.SettingContentsChanged(contents))
+    }
+    @Module
+    abstract class SettingsFragmentModule{
+        @Module
+        companion object {
+            @PageScope
+            @JvmStatic
+            @Provides
+            fun providesLifecycle(
+                settingsFragment: SettingsFragment
+            ): Lifecycle{
+                return settingsFragment.viewLifecycleOwner.lifecycle
+            }
+        }
 }

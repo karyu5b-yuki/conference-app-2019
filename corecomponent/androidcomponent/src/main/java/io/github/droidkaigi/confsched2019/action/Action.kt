@@ -94,7 +94,7 @@ sealed class Action {
 
     class FloorMapLoadingStateChanged(val loadingState: LoadingState) : Action()
 
-    data class SettingContentsChanged(val contents: SettingContents) : Action()
+    data class SettingContentsChanged(val contents: Map<String, Boolean>) : Action()
 
 }
 
