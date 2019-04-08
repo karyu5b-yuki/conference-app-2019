@@ -14,10 +14,7 @@ import javax.inject.Inject
  * Inject in [onActivityCreated].
  * Because you can not get [Fragment.getViewLifecycleOwner] when [onAttach] timing
  */
-open class DaggerFragment : PreferenceFragmentCompat(), HasSupportFragmentInjector {
-
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-    }
+open class DaggerFragment : Fragment(), HasSupportFragmentInjector {
 
     @Inject lateinit var childFragmentInjector: DispatchingAndroidInjector<Fragment>
     override fun onActivityCreated(savedInstanceState: Bundle?) {

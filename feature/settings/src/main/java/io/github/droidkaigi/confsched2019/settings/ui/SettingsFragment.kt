@@ -3,7 +3,10 @@ package io.github.droidkaigi.confsched2019.settings.ui
 import android.content.SharedPreferences
 import android.os.Bundle
 import android.util.Log
+import android.view.LayoutInflater
 import android.view.View
+import android.view.ViewGroup
+import android.widget.CheckBox
 import androidx.lifecycle.Lifecycle
 import androidx.preference.PreferenceManager
 import dagger.Module
@@ -11,17 +14,27 @@ import dagger.Provides
 import io.github.droidkaigi.confsched2019.action.Action
 import io.github.droidkaigi.confsched2019.di.PageScope
 import io.github.droidkaigi.confsched2019.ext.changed
+import io.github.droidkaigi.confsched2019.settings.R
 import javax.inject.Inject
 
 class SettingsFragment : DaggerFragment(),
+    setContentView(R.layout.preferences)
+    val preference = findViewById<CheckBox>(R.id.__)
+    checkbox.setOnClickListener{
+
+}
     SharedPreferences.OnSharedPreferenceChangeListener {
 
     @Inject lateinit var preferenceActionCreator: PreferenceActionCreator
     @Inject lateinit var settingsStore: SettingsStore
 
-    override fun onCreatePreferences(savedInstanceState: Bundle?, rootKey: String?) {
-        addPreferencesFromResource(io.github.droidkaigi.confsched2019.settings.R.xml.preferences)
-    }
+//    override fun onCreateView(
+//        inflater: LayoutInflater,
+//        container: ViewGroup?,
+//        savedInstanceState: Bundle?
+//    ): View? {
+//        return inflater.inflate(R.layout.frament, container, false)
+//    }
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -52,12 +65,12 @@ class SettingsFragment : DaggerFragment(),
 
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
-        preferenceScreen.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
+//        preferenceScreen.sharedPreferences.registerOnSharedPreferenceChangeListener(this)
     }
 
     override fun onDestroy() {
         // TODO: ここで、現状のswitchのon, offをSharedPreferenceに保存してあげる。
-        preferenceScreen.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
+//        preferenceScreen.sharedPreferences.unregisterOnSharedPreferenceChangeListener(this)
         super.onDestroy()
     }
 
