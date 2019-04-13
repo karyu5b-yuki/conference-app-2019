@@ -18,7 +18,7 @@ import javax.inject.Inject
 import javax.inject.Singleton
 
 @Singleton
-class SessionContentsStore @Inject constructor(
+class  SessionContentsStore @Inject constructor(
     dispatcher: Dispatcher
 ) {
     val loadingState = dispatcher

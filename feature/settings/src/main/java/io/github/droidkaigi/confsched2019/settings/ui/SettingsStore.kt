@@ -15,10 +15,7 @@ class SettingsStore @Inject constructor(
 ) : Store() {
 
     val settingsResult : LiveData<SettingContents> = dispatcher
-        // subscribeのあとに帰ってくるdataの形は、
-        // data class SettingContentsLoaded(
-        // val contents: List<SettingContent>
-        // ) : Action()
+
         .subscribe<Action.SettingContentsChanged>()
         .map { SettingContents(it.contents) }
         .toLiveData(this, null)
