@@ -17,7 +17,7 @@ import io.github.droidkaigi.confsched2019.settings.R
 import java.lang.RuntimeException
 import javax.inject.Inject
 
-class SettingsFragment : DaggerFragment() {
+class SettingsFragment : Fragment() {
 
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View? {
@@ -73,22 +73,10 @@ class SettingsFragment : DaggerFragment() {
         private const val SESSION_URL = "session_url_key"
         private const val EVENT_HUSHTAG = "event_hashtag_key"
         private const val ROOM_HUSHTAG = "room_hashtag_key"
-
-        fun newInstance() = SettingsFragment()
-
-}
-
-    @Inject lateinit var preferenceActionCreator: PreferenceActionCreator
-    @Inject lateinit var settingsStore: SettingsStore
-
+    }
     override fun onActivityCreated(savedInstanceState: Bundle?) {
         super.onActivityCreated(savedInstanceState)
     }
-
-    override fun onDestroy() {
-        super.onDestroy()
-    }
-
 }
 
 @Module
@@ -105,56 +93,3 @@ abstract class SettingsFragmentModule {
         }
     }
 }
-
-
-//    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-//        super.onViewCreated(view, savedInstanceState)
-//        settingsStore.settingsResult.changed(viewLifecycleOwner) { settingContents ->
-//            for (content in settingContents.preferences) {
-//                val editor = PreferenceManager.getDefaultSharedPreferences(context).edit()
-//                editor.putBoolean(content.key, content.value ?: false)
-//                editor.apply()
-//            }
-//        }
-//    }
-//    override fun onSharedPreferenceChanged(sharedPreferences: SharedPreferences?, key: String?) {
-//        val contents = mutableMapOf<String, Boolean?>()
-//        val changed_title = sharedPreferences?.getBoolean(
-//            "session_title", false
-//        )
-//        val changed_url = sharedPreferences?.getBoolean(
-//            "session_url", false
-//        )
-//        val changed_event = sharedPreferences?.getBoolean(
-//            "event_hashtag", false
-//        )
-//        val changed_room = sharedPreferences?.getBoolean(
-//            "room_hashtag", false
-//        )
-//
-//        contents["session_title"] = changed_title
-//        contents["session_url"] = changed_url
-//        contents["event_hashtag"] = changed_event
-//        contents["room_hashtag"] = changed_room
-
-//        preferenceActionCreator.submit(Action.SettingContentsChanged(contents))
-//    }
-/*
-    private fun settingContent(
-        changed_title: Boolean?,
-        changed_url: Boolean?,
-        changed_event: Boolean?,
-        changed_room: Boolean?
-    ): MutableMap<Any, Any> =
-        mutableMapOf(changed_title, changed_url, changed_event, changed_room)
-}
-
-    preferenceActionCreator.submit(Action.SettingContentsChanged(
-    -            settingContent(
-    -                changed_title,
-    -                changed_url,
-    -                changed_event,
-    -                changed_room
-    -            )
-    -        ))
-*/

@@ -13,10 +13,10 @@ import com.xwray.groupie.GroupAdapter
 import com.xwray.groupie.ViewHolder
 import dagger.Module
 import dagger.Provides
+import dagger.android.support.DaggerFragment
 import io.github.droidkaigi.confsched2019.about.R
 import io.github.droidkaigi.confsched2019.about.databinding.FragmentAboutBinding
 import io.github.droidkaigi.confsched2019.about.ui.item.AboutSection
-import io.github.droidkaigi.confsched2019.about.ui.widget.DaggerFragment
 import io.github.droidkaigi.confsched2019.about.ui.widget.DottedItemDecoration
 import io.github.droidkaigi.confsched2019.di.PageScope
 import io.github.droidkaigi.confsched2019.ext.changed

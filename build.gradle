@@ -41,7 +41,6 @@ buildscript {
         classpath Dep.GradlePlugin.licensesPlugin
         classpath Dep.GradlePlugin.crashlytics
         classpath Dep.GradlePlugin.iconRibbonPlugin
-        classpath 'com.android.tools.build:gradle:3.4.0-beta05'
     }
 }
 
