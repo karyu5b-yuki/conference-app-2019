@@ -92,4 +92,6 @@ sealed class Action {
     data class SessionSurveyLoaded(val sessionFeedback: SessionFeedback) : Action()
 
     class FloorMapLoadingStateChanged(val loadingState: LoadingState) : Action()
+
+    data class SettingContentsChanged(val contents : MutableMap<String, Boolean>) : Action()
 }

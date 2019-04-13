@@ -1,3 +1,22 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
+    <string name ="share_setting_title">Sharing Settings for Tweet</string>
+    <string name ="share_setting_key">share_setting</string>
+
+    <string name ="session_title_title">Session Title</string>
+    <string name ="session_title_key">session_title</string>
+    <string name ="session_title_summary">ex.What will be changed on tests in multi-module projects</string>
+
+    <string name ="session_url_title">Session URL</string>
+    <string name ="session_url_key">session_url</string>
+    <string name ="session_url_summary">ex.https://droidkaigi.jp/2019/..</string>
+
+    <string name ="event_hashtag_title">Event Hashtag</string>
+    <string name ="event_hashtag_key">event_hashtag</string>
+    <string name ="event_hashtag_summary">ex.#droidkaigi</string>
+
+    <string name ="room_hashtag_title">Room Hashtag</string>
+    <string name ="room_hashtag_key">room_hashtag</string>
+    <string name ="room_hashtag_summary">ex.#hallA, #room1</string>
+
 </resources>

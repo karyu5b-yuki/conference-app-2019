@@ -1,7 +1,8 @@
-package io.github.droidkaigi.confsched2019.about.ui.widget
+package io.github.droidkaigi.confsched2019.settings.ui
 
 import android.os.Bundle
 import androidx.fragment.app.Fragment
+import androidx.preference.PreferenceFragmentCompat
 import dagger.android.AndroidInjector
 import dagger.android.DispatchingAndroidInjector
 import dagger.android.support.AndroidSupportInjection

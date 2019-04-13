@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <bool name="session_title_default">true</bool>
+    <bool name="session_url_default">true</bool>
+    <bool name="event_hashtag_default">true</bool>
+    <bool name="room_hashtag_default">true</bool>
+</resources>
