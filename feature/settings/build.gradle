@@ -44,4 +44,5 @@ dependencies {
     testImplementation Dep.Test.junit
     androidTestImplementation Dep.Test.testRunner
     androidTestImplementation Dep.Test.espressoCore
+    compile project(path: ':feature:system')
 }
